@@ -13,12 +13,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.HTMLEditor?>
 
-
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <ToolBar prefHeight="40.0" prefWidth="200.0">
         <items>
-          <Button mnemonicParsing="false" text="Send">
+          <Button fx:id="sendButton" mnemonicParsing="false" text="Send">
                <graphic>
                   <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -40,7 +39,7 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label text="To">
+            <Label fx:id="toLabel" text="To">
                <opaqueInsets>
                   <Insets />
                </opaqueInsets>
@@ -48,21 +47,21 @@
                   <Insets left="8.0" />
                </padding>
             </Label>
-            <Label text="Cc" GridPane.rowIndex="1">
+            <Label fx:id="ccLabel" text="Cc" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets left="8.0" />
                </GridPane.margin>
             </Label>
-            <Label text="Ccn" GridPane.rowIndex="2">
+            <Label fx:id="ccnLabel" text="Ccn" GridPane.rowIndex="2">
                <GridPane.margin>
                   <Insets left="8.0" />
                </GridPane.margin>
             </Label>
-            <TextField GridPane.columnIndex="1" />
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="toField" GridPane.columnIndex="1" />
+            <TextField fx:id="ccField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <TextField fx:id="ccnField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
          </children>
       </GridPane>
-      <HTMLEditor htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" prefHeight="200.0" prefWidth="506.0" />
+      <HTMLEditor fx:id="editHTMLEditor" htmlText="&lt;html&gt;&lt;head&gt;&lt;/head&gt;&lt;body contenteditable=&quot;true&quot;&gt;&lt;/body&gt;&lt;/html&gt;" prefHeight="200.0" prefWidth="506.0" />
    </children>
 </VBox>
