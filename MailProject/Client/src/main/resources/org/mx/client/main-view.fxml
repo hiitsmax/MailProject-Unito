@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.mx.client.MainController">
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <padding>
       <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
    </padding>
@@ -34,10 +34,10 @@
          <children>
             <Label fx:id="mailLabel" text="Mail" />
             <Label fx:id="passwordLabel" text="Password" GridPane.rowIndex="2" />
-            <PasswordField fx:id="passwordLabel" GridPane.rowIndex="3" />
+            <PasswordField fx:id="passwordField" GridPane.rowIndex="3" />
             <TextField fx:id="mailField" GridPane.rowIndex="1" />
          </children>
       </GridPane>
-      <Button fx:id="loginButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" text="Login" />
+      <Button fx:id="loginButton" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onLoginButtonClick" text="Login" />
    </children>
 </VBox>

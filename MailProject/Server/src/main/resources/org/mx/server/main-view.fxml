@@ -10,7 +10,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/20.0.1" fx:controller="org.mx.server.MainController">
+<VBox alignment="CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+      <!--fx:controller="org.mx.server.MainController"-->
+
   <padding>
     <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
   </padding>
@@ -19,19 +21,19 @@
       <font>
          <Font size="48.0" />
       </font></Label>
-   <ListView prefHeight="200.0" prefWidth="200.0" />
+   <ListView fx:id="consoleList" prefHeight="200.0" prefWidth="200.0" />
    <Label fx:id="welcomeText1" text="Choose the Postal Center" />
    <GridPane>
      <columnConstraints>
-       <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-       <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+       <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="100.0" />
+       <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="100.0" />
      </columnConstraints>
      <rowConstraints>
        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
      </rowConstraints>
       <children>
-        <Button onAction="#onHelloButtonClick" text="New" GridPane.hgrow="SOMETIMES" />
-         <Button onAction="#onHelloButtonClick" text="Open" GridPane.columnIndex="1" />
+        <Button fx:id="newButton" maxWidth="1.7976931348623157E308" minHeight="-Infinity" onAction="#onNewButtonClick" text="New" GridPane.hgrow="ALWAYS" />
+         <Button fx:id="openButton" maxWidth="1.7976931348623157E308" minHeight="-Infinity" onAction="#onOpenButtonClick" text="Open" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
       </children>
    </GridPane>
    <Label fx:id="welcomeText11" text="Control the engine" />
@@ -44,8 +46,8 @@
          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
       </rowConstraints>
       <children>
-         <Button onAction="#onHelloButtonClick" text="Start" GridPane.hgrow="SOMETIMES" />
-         <Button onAction="#onHelloButtonClick" text="Stop" GridPane.columnIndex="1" />
+         <Button fx:id="startButton" maxWidth="1.7976931348623157E308" onAction="#onStartButtonClick" text="Start" GridPane.hgrow="SOMETIMES" />
+         <Button fx:id="stopButton" maxWidth="1.7976931348623157E308" onAction="#onStopButtonClick" text="Stop" GridPane.columnIndex="1" />
       </children>
    </GridPane>
 </VBox>

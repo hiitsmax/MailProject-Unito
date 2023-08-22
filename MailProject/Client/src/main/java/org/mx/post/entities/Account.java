@@ -24,4 +24,12 @@ public class Account implements java.io.Serializable {
         this.email = email;
         this.password = password;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Account){
+           return this.password.equals(((Account)obj).getPassword()) &&  this.email.equals(((Account)obj).getEmail());
+        }
+        return super.equals(obj);
+    }
 }

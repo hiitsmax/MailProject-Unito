@@ -10,9 +10,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/Client" />
-            <option value="$PROJECT_DIR$/Mail" />
-            <option value="$PROJECT_DIR$/Server" />
           </set>
         </option>
       </GradleProjectSettings>
@@ -23,9 +20,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/Client" />
-            <option value="$PROJECT_DIR$/Client/Client" />
-            <option value="$PROJECT_DIR$/Client/Post" />
-            <option value="$PROJECT_DIR$/Client/Server" />
           </set>
         </option>
       </GradleProjectSettings>
@@ -36,9 +30,6 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/Server" />
-            <option value="$PROJECT_DIR$/Server/Client" />
-            <option value="$PROJECT_DIR$/Server/Post" />
-            <option value="$PROJECT_DIR$/Server/Server" />
           </set>
         </option>
       </GradleProjectSettings>

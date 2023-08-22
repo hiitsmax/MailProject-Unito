@@ -34,11 +34,8 @@ public class MailVault  implements java.io.Serializable{
     }
 
     public ArrayList<Mail> getMailSentTo(Account receiver){
-        System.out.println("Getting email received by "+ receiver);
         ArrayList<Mail> sentTo = new ArrayList<Mail>();
         for (Mail mail : mails) {
-            System.out.println("Checking email "+mail.toString());
-            System.out.println(mail.getTo().get(0));
             if (mail.getTo().contains(receiver.getEmail())) {
                 sentTo.add(mail);
             }

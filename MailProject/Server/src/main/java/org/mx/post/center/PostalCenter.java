@@ -14,7 +14,7 @@ public class PostalCenter implements java.io.Serializable{
         mailVault = new MailVault();
 
         ArrayList<String> to=new ArrayList<>();
-        ArrayList<String> from=new ArrayList<>();
+        to.add("hiitsmax@post.com");
 
         mailVault.addMail(new Mail(
                 "AAAA",
@@ -23,7 +23,7 @@ public class PostalCenter implements java.io.Serializable{
                 "porcatroia",
                 to,
                 new ArrayList<>(),
-                from,
+                to,
                 new Date()
         ));
     }
@@ -41,7 +41,7 @@ public class PostalCenter implements java.io.Serializable{
     }
     public MailBox getMailBoxOf(String mail){
         Account account = accountVault.getAccountByEmail(mail);
-        return new MailBox(mailVault.getMailSentTo(account), mailVault.getMailSentBy(account), mailVault.getMailCCedTo(account));
+        return new MailBox(mailVault.getMailSentBy(account), mailVault.getMailSentTo(account), mailVault.getMailCCedTo(account));
     }
     public MailBox getMailBoxOf(Account account){
         return new MailBox(mailVault.getMailSentTo(account), mailVault.getMailSentBy(account), mailVault.getMailCCedTo(account));
