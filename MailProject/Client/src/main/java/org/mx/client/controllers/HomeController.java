@@ -1,14 +1,21 @@
 package org.mx.client.controllers;
 
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import javafx.util.Callback;
+import org.mx.client.MainApplication;
 import org.mx.client.services.SessionManager;
 import org.mx.post.center.MailBox;
 import org.mx.post.entities.Bag;
 import org.mx.post.entities.Mail;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class HomeController {
@@ -71,7 +78,39 @@ public class HomeController {
                 };
             }
         });
+        inboxTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if(event.getClickCount() == 2){
+                    Mail selectedMail = (Mail) inboxTable.getSelectionModel().getSelectedItem();
+                    if(selectedMail!=null){
+                        try {
+                            openMail(selectedMail);
+                        } catch (IOException e) {
+                            showError("There has been an error opening the mail: "+e.getMessage());
+                        }
+                    }
+                }
+            }
+        });
 
         inboxTable.getItems().addAll(mailBox.getReceived());
+    }
+
+    public void openMail(Mail mail) throws IOException {
+
+        OpenMessageController openMessageController = new OpenMessageController();
+
+        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("open-message-view.fxml"));
+        fxmlLoader.setController(openMessageController);
+        openMessageController.setSessionManager(sessionManager);
+
+        Scene scene = new Scene(fxmlLoader.load());
+        Stage secondStage = new Stage();
+        secondStage.setTitle("Hello!");
+        secondStage.setScene(scene);
+        secondStage.show();
+
+        openMessageController.setMail(mail);
     }
 }
