@@ -12,6 +12,7 @@ public class Bag<T> implements Serializable {
         MAILBOX_DOWNLOAD,
         MAILBOX,
         MAIL_IN,
+        NOTIFY_RESULT,
         MAIL_OUT
     }
     public enum resultCode{

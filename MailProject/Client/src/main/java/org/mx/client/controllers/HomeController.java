@@ -113,4 +113,18 @@ public class HomeController {
 
         openMessageController.setMail(mail);
     }
+
+    public void openNewMail() throws IOException{
+        NewMessageController newMessageController = new NewMessageController();
+
+        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("new-view.fxml"));
+        fxmlLoader.setController(newMessageController);
+        newMessageController.setSessionManager(sessionManager);
+
+        Scene scene = new Scene(fxmlLoader.load());
+        Stage secondStage = new Stage();
+        secondStage.setTitle("New message");
+        secondStage.setScene(scene);
+        secondStage.show();
+    }
 }

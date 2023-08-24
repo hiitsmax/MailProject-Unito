@@ -6,7 +6,7 @@
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="$PROJECT_DIR$/../../../../../../SDKs/gradle-8.1.1" />
+        <option name="gradleHome" value="$USER_HOME$/SDKs/gradle-8.1.1" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -16,7 +16,8 @@
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/Client" />
-        <option name="gradleHome" value="$PROJECT_DIR$/../../../../../../SDKs/gradle-8.1.1" />
+        <option name="gradleHome" value="$USER_HOME$/SDKs/gradle-8.1.1" />
+        <option name="gradleJvm" value="corretto-19" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/Client" />
@@ -26,7 +27,8 @@
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/Server" />
-        <option name="gradleHome" value="$PROJECT_DIR$/../../../../../../SDKs/gradle-8.1.1" />
+        <option name="gradleHome" value="$USER_HOME$/SDKs/gradle-8.1.1" />
+        <option name="gradleJvm" value="corretto-19" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/Server" />

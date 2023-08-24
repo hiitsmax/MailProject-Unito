@@ -6,7 +6,7 @@ import java.util.Date;
 public class Mail implements java.io.Serializable{
     String UUID;
     String threadUUID;
-    Boolean isThreadStarter;
+    Boolean isThreadStarter=true;
     String body;
     String subject;
 
@@ -20,6 +20,7 @@ public class Mail implements java.io.Serializable{
 
     ArrayList<String> To;
     ArrayList<String> CC;
+    ArrayList<String> CCn;
     ArrayList<String> From;
     Date SentDate;
 
@@ -63,6 +64,14 @@ public class Mail implements java.io.Serializable{
         To = to;
     }
 
+    public ArrayList<String> getCCn() {
+        return CCn;
+    }
+
+    public void setCCn(ArrayList<String> CCn) {
+        this.CCn = CCn;
+    }
+
     public ArrayList<String> getCC() {
         return CC;
     }
@@ -96,5 +105,11 @@ public class Mail implements java.io.Serializable{
         this.CC = CC;
         From = from;
         SentDate = sentDate;
+    }
+
+    public Mail(){
+        this.To = new ArrayList<>();
+        this.CC = new ArrayList<>();
+        this.From = new ArrayList<>();
     }
 }

@@ -8,6 +8,7 @@ import org.mx.post.center.MailBox;
 import org.mx.post.center.PostalCenter;
 import org.mx.post.entities.Account;
 import org.mx.post.entities.Bag;
+import org.mx.post.entities.Mail;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -74,6 +75,7 @@ public class SessionManager {
                         log("Bag payload: "+resultBag.getPayload().getClass().getName());
                         switch (resultBag.getType()){
                             case LOGIN_CREDENTIALS -> resultBag=handleLogin(resultBag);
+                            case MAIL_OUT -> resultBag=handleMailIn(resultBag);
                         }
                     // }
                     log("Object processed");
@@ -117,6 +119,19 @@ public class SessionManager {
         }
 
         return null;
+    }
+
+    private Bag handleMailIn(Bag incomingBag){
+        log("Handling incoming mail...");
+        if(incomingBag.getPayload() instanceof Mail){
+            Mail mail = (Mail)incomingBag.getPayload();
+            log("Email put in the center");
+            postalCenter.addMail(mail);
+            return new Bag<>(null, Bag.bagType.NOTIFY_RESULT, Bag.resultCode.SUCCESS);
+        }else{
+            log("Bag payload is not Mail");
+            return new Bag<>("Not an email", Bag.bagType.NOTIFY_RESULT, Bag.resultCode.FAILED);
+        }
     }
 
 

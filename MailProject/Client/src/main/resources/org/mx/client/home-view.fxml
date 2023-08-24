@@ -24,7 +24,7 @@
    <children>
       <ToolBar prefHeight="64.0" prefWidth="200.0">
          <items>
-            <Button fx:id="newMessageButton" mnemonicParsing="false" text="New Message">
+            <Button fx:id="newMessageButton"  onAction="#openNewMail" mnemonicParsing="false" text="New Message">
                <graphic>
                   <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                      <image>

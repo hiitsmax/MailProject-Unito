@@ -1,6 +1,7 @@
 module org.mx.client {
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.web;
 
 
     opens org.mx.client to javafx.fxml;

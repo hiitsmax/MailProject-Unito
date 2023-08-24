@@ -5,6 +5,7 @@ import org.mx.post.entities.Mail;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.UUID;
 
 public class PostalCenter implements java.io.Serializable{
     AccountVault accountVault;
@@ -26,6 +27,17 @@ public class PostalCenter implements java.io.Serializable{
                 to,
                 new Date()
         ));
+    }
+
+    public void addMail(Mail mail){
+        UUID uuid = UUID.randomUUID();
+
+        if(mail.getThreadStarter()){
+            mail.setThreadUUID(uuid.toString());
+        }
+        mail.setUUID(uuid.toString());
+        mail.setSentDate(new Date());
+        mailVault.addMail(mail);
     }
 
     public Account getAccountByEmail(String email){
