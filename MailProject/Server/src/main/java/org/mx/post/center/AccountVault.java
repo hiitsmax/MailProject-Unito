@@ -9,6 +9,7 @@ public class AccountVault implements java.io.Serializable{
     AccountVault() {
         accounts = new ArrayList<Account>();
         accounts.add(new Account("hiitsmax@post.com", "1234"));
+        accounts.add(new Account("hiitsmaxi@post.com", "1234"));
     }
     public ArrayList<Account> getAccounts() {
         return accounts;

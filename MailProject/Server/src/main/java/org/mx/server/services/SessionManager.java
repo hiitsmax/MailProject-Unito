@@ -76,6 +76,7 @@ public class SessionManager {
                         switch (resultBag.getType()){
                             case LOGIN_CREDENTIALS -> resultBag=handleLogin(resultBag);
                             case MAIL_OUT -> resultBag=handleMailIn(resultBag);
+                            case MAILBOX_DOWNLOAD -> resultBag=handleMailboxDownload(resultBag);
                         }
                     // }
                     log("Object processed");
@@ -131,6 +132,23 @@ public class SessionManager {
         }else{
             log("Bag payload is not Mail");
             return new Bag<>("Not an email", Bag.bagType.NOTIFY_RESULT, Bag.resultCode.FAILED);
+        }
+    }
+
+    private Bag<MailBox> handleMailboxDownload(Bag incomingBag) throws Exception {
+        log("Handling mailbox download...");
+        if(incomingBag.getPayload() instanceof Account){
+            Account account = (Account) incomingBag.getPayload();
+            log("Checking account");
+            if(postalCenter.isAccountValid(account)){
+                log("Account is ok!");
+                return new Bag<>(postalCenter.getMailBoxOf(account.getEmail()), Bag.bagType.MAILBOX, Bag.resultCode.SUCCESS);
+            }else{
+                log("Account not ok man");
+                return new Bag<>(null, Bag.bagType.LOGIN_CREDENTIALS, Bag.resultCode.FAILED);
+            }
+        }else {
+            throw new Exception("This is not an account");
         }
     }
 

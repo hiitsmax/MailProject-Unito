@@ -3,28 +3,36 @@ package org.mx.client.controllers;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javafx.util.Duration;
+import org.controlsfx.control.Notifications;
 import org.mx.client.MainApplication;
 import org.mx.client.services.SessionManager;
 import org.mx.post.center.MailBox;
 import org.mx.post.entities.Bag;
 import org.mx.post.entities.Mail;
+import org.mx.client.services.RefreshMailbox;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
-public class HomeController {
+public class HomeController implements Initializable {
     @FXML
     private TextField mailField;
     @FXML
     private TextField passwordField;
     @FXML
     private TableView inboxTable;
+    @FXML
+    private TableView sentTable;
     @FXML
     private TableColumn<Mail, ArrayList<String>> fromInboxColumn;
     @FXML
@@ -94,6 +102,8 @@ public class HomeController {
             }
         });
 
+        sessionManager.setMailBox(mailBox);
+
         inboxTable.getItems().addAll(mailBox.getReceived());
     }
 
@@ -126,5 +136,14 @@ public class HomeController {
         secondStage.setTitle("New message");
         secondStage.setScene(scene);
         secondStage.show();
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
+        RefreshMailbox refreshService = new RefreshMailbox(sessionManager, inboxTable, sentTable);
+        refreshService.setPeriod(Duration.seconds(30)); // The interval between executions.
+        refreshService.start();
+
     }
 }

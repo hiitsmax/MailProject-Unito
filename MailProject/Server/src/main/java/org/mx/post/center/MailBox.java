@@ -4,7 +4,7 @@ import org.mx.post.entities.Mail;
 
 import java.util.ArrayList;
 
-public class MailBox  implements java.io.Serializable{
+public class MailBox implements java.io.Serializable{
     ArrayList<Mail> sent;
     ArrayList<Mail> received;
     ArrayList<Mail> CCed;
@@ -42,4 +42,36 @@ public class MailBox  implements java.io.Serializable{
     public void setCCed(ArrayList<Mail> CCed) {
         this.CCed = CCed;
     }
+
+    public MailBox getDifferenceFrom(MailBox mailBox){
+        ArrayList<Mail> sentDifference = getDifference(sent, mailBox.getSent());
+        ArrayList<Mail> ccedDifference = getDifference(CCed, mailBox.getCCed());
+        ArrayList<Mail> receivedDifference = getDifference(received, mailBox.getReceived());
+
+        MailBox resultBox = new MailBox();
+        resultBox.setReceived(receivedDifference);
+        resultBox.setCCed(ccedDifference);
+        resultBox.setReceived(receivedDifference);
+
+        return resultBox;
+    }
+
+    private ArrayList<Mail> getDifference(ArrayList<Mail> mailListA, ArrayList<Mail> mailListB){
+        ArrayList<Mail> difference = new ArrayList<Mail>();
+        for(Mail thisMail: mailListA){
+            boolean found = false;
+            for(Mail otherMail: mailListB){
+                System.out.println("Checking "+thisMail.getUUID()+" with "+otherMail.getUUID());
+                if(thisMail.getUUID().equals(otherMail.getUUID())){
+                    found=true;
+                }
+            }
+            if(!found){
+                difference.add(thisMail);
+                System.out.println("Mail "+thisMail.getUUID()+" added");
+            }
+        }
+        return difference;
+    }
+
 }

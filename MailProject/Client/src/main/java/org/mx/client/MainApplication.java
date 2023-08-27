@@ -4,9 +4,11 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.controlsfx.control.Notifications;
 import org.mx.client.controllers.MainController;
 import org.mx.client.services.SessionManager;
 
@@ -26,6 +28,7 @@ public class MainApplication extends Application {
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();
+        Notifications.create().position(Pos.TOP_CENTER).text("HHH").title("HHHH").showWarning();
     }
 
 

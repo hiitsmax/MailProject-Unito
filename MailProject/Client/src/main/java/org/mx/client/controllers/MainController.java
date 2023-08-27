@@ -7,6 +7,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.controlsfx.control.Notifications;
 import org.mx.client.MainApplication;
 import org.mx.client.services.SessionManager;
 import org.mx.post.center.MailBox;
@@ -37,7 +38,6 @@ public class MainController {
                 }
             } catch (Exception e) {
                 showError(e.getMessage() + ", cause: " + e.getCause());
-                System.out.println(e.getCause().getMessage());
             }
 
 
@@ -93,6 +93,5 @@ public class MainController {
         homeController.welcomeBag(response);
         Stage thisStage = (Stage)loginButton.getScene().getWindow();
         thisStage.close();
-
     }
 }

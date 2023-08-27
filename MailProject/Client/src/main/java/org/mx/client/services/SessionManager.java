@@ -2,6 +2,7 @@ package org.mx.client.services;
 
 import javafx.collections.ObservableList;
 import org.mx.post.center.MailBox;
+import org.mx.post.center.MailVault;
 import org.mx.post.entities.Account;
 import org.mx.post.entities.Bag;
 import org.mx.post.entities.Mail;
@@ -15,6 +16,15 @@ public class SessionManager {
     private ObservableList<String> logList;
     private Account account;
     private int port = 6969;
+    private MailBox mailBox;
+
+    public MailBox getMailBox() {
+        return mailBox;
+    }
+
+    public void setMailBox(MailBox mailBox) {
+        this.mailBox = mailBox;
+    }
 
     public Account getAccount() {
         return account;
@@ -24,6 +34,25 @@ public class SessionManager {
         Bag mailBag = new Bag<Mail>(mail, Bag.bagType.MAIL_OUT, Bag.resultCode.SUCCESS);
         return sendBag(mailBag);
     }
+
+    public MailBox refreshMailbox() throws Exception {
+        Bag refreshBag = new Bag<Account>(account, Bag.bagType.MAILBOX_DOWNLOAD, Bag.resultCode.SUCCESS);
+        Bag resultBag =  sendBag(refreshBag);
+
+        if(resultBag.getResultCode()== Bag.resultCode.SUCCESS){
+            if(resultBag.getPayload() instanceof MailBox){
+                MailBox newMailBox = (MailBox) resultBag.getPayload();
+                MailBox mailBoxDiff = newMailBox.getDifferenceFrom(mailBox);
+                mailBox = newMailBox;
+                return mailBoxDiff;
+            }else{
+                throw new Exception("Got a non mailbox");
+            }
+        }else{
+            throw new Exception(resultBag.getPayload().toString());
+        }
+    }
+
 
     public void setAccount(Account account) {
         this.account = account;
