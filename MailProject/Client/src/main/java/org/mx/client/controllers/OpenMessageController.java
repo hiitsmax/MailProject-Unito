@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 import org.mx.client.MainApplication;
@@ -28,9 +29,12 @@ public class OpenMessageController {
     private TableColumn<Mail, ArrayList<String>> fromInboxColumn;
     @FXML
     private TableColumn<Mail, String> bodyInboxColumn;
+    @FXML
+    private WebView messageWebView;
 
     private SessionManager sessionManager;
     private MailBox mailBox;
+    private Mail thisMail;
 
 
 
@@ -58,7 +62,8 @@ public class OpenMessageController {
     }
 
     public void setMail(Mail mail){
-        System.out.println(mail.getBody());
+        this.thisMail=mail;
+        messageWebView.getEngine().loadContent(mail.getBody());
     }
 
 

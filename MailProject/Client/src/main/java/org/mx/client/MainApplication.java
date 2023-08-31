@@ -28,7 +28,6 @@ public class MainApplication extends Application {
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();
-        Notifications.create().position(Pos.TOP_CENTER).text("HHH").title("HHHH").showWarning();
     }
 
 

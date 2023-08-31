@@ -6,13 +6,10 @@ public class Bag<T> implements Serializable {
 
     public enum bagType{
         LOGIN_CREDENTIALS,
-        LOGIN_ACCOUNT,
-        ACCOUNT_INFO,
-        ACCOUNT,
         MAILBOX_DOWNLOAD,
         MAILBOX,
-        MAIL_IN,
         NOTIFY_RESULT,
+        DELETE_MAIL,
         MAIL_OUT
     }
     public enum resultCode{

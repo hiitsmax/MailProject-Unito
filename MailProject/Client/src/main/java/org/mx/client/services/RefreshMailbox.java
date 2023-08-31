@@ -3,8 +3,10 @@ package org.mx.client.services;
 import javafx.application.Platform;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
+import javafx.geometry.Pos;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableView;
+import org.controlsfx.control.Notifications;
 import org.mx.post.center.MailBox;
 import org.mx.post.entities.Mail;
 
@@ -27,7 +29,6 @@ public class RefreshMailbox extends ScheduledService<Void> {
         return new Task<Void>(){
             @Override
             protected Void call() throws Exception {
-                // here i should update the main mailbox, get the difference, spam notifications and refresh the whole thing
                 MailBox difference = sessionManager.refreshMailbox();
                 ArrayList<Mail> mailsToNotify = new ArrayList();
 
@@ -36,12 +37,16 @@ public class RefreshMailbox extends ScheduledService<Void> {
 
                 inboxTable.getItems().addAll(mailsToNotify);
                 sentTable.getItems().addAll(difference.getSent());
+                System.out.println(mailsToNotify.size());
+                System.out.println(difference.getReceived().size());
 
+                for(Mail mail : mailsToNotify){
+                    //Here we should notify the whole thing
+                    System.out.println(mail);
+                    Notifications.create().position(Pos.TOP_CENTER).text(mail.getBody().replaceAll("\\<.*?>","")).title(mail.getFrom().get(0)+mail.getSubject()).showWarning();
+                }
                 Platform.runLater(() -> {
-                    for(Mail mail : mailsToNotify){
-                        //Here we should notify the whole thing
-                        System.out.println("New maill: " + mail.getBody());
-                    }
+                    System.out.println("JJJJ");
                 });
                 return null;
             }

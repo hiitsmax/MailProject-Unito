@@ -29,6 +29,13 @@ public class PostalCenter implements java.io.Serializable{
         ));
     }
 
+    public boolean isAccountPresent(String mail){
+        for(Account account: accountVault.getAccounts()){
+            if(account.getEmail().equals(mail)) return true;
+        }
+        return false;
+    }
+
     public void addMail(Mail mail){
         UUID uuid = UUID.randomUUID();
 

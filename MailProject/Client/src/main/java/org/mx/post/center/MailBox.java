@@ -51,7 +51,7 @@ public class MailBox implements java.io.Serializable{
         MailBox resultBox = new MailBox();
         resultBox.setReceived(receivedDifference);
         resultBox.setCCed(ccedDifference);
-        resultBox.setSent(sent);
+        resultBox.setSent(sentDifference);
 
         return resultBox;
     }

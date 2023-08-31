@@ -36,7 +36,15 @@ public class HomeController implements Initializable {
     @FXML
     private TableColumn<Mail, ArrayList<String>> fromInboxColumn;
     @FXML
+    private TableColumn<Mail, ArrayList<String>> subjectInboxColumn;
+    @FXML
     private TableColumn<Mail, String> bodyInboxColumn;
+    @FXML
+    private TableColumn<Mail, ArrayList<String>> fromSentColumn;
+    @FXML
+    private TableColumn<Mail, ArrayList<String>> subjectSentColumn;
+    @FXML
+    private TableColumn<Mail, String> bodySentColumn;
 
     private SessionManager sessionManager;
     private MailBox mailBox;
@@ -66,9 +74,10 @@ public class HomeController implements Initializable {
         this.sessionManager=sessionManager;
     }
 
-    public void welcomeBag(Bag bag){
-        mailBox=(MailBox) bag.getPayload();
+    private void fullfillInbox(){
+
         fromInboxColumn.setCellValueFactory(new PropertyValueFactory<>("From"));
+        subjectInboxColumn.setCellValueFactory(new PropertyValueFactory<>("subject"));
         bodyInboxColumn.setCellValueFactory(new PropertyValueFactory<>("body"));
         fromInboxColumn.setCellFactory(new Callback<>() {
             @Override
@@ -81,6 +90,22 @@ public class HomeController implements Initializable {
                             setText(null);
                         } else {
                             setText(item.get(0));
+                        }
+                    }
+                };
+            }
+        });
+        bodyInboxColumn.setCellFactory(new Callback<>() {
+            @Override
+            public TableCell<Mail, String> call(TableColumn<Mail, String> column) {
+                return new TableCell<Mail, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item == null || empty) {
+                            setText(null);
+                        } else {
+                            setText(item.replaceAll("\\<.*?>",""));
                         }
                     }
                 };
@@ -105,6 +130,68 @@ public class HomeController implements Initializable {
         sessionManager.setMailBox(mailBox);
 
         inboxTable.getItems().addAll(mailBox.getReceived());
+    }
+    private void fullfillSent(){
+
+        fromSentColumn.setCellValueFactory(new PropertyValueFactory<>("From"));
+        subjectSentColumn.setCellValueFactory(new PropertyValueFactory<>("subject"));
+        bodySentColumn.setCellValueFactory(new PropertyValueFactory<>("body"));
+        fromSentColumn.setCellFactory(new Callback<>() {
+            @Override
+            public TableCell<Mail, ArrayList<String>> call(TableColumn<Mail, ArrayList<String>> column) {
+                return new TableCell<Mail, ArrayList<String>>() {
+                    @Override
+                    protected void updateItem(ArrayList<String> item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item == null || empty) {
+                            setText(null);
+                        } else {
+                            setText(item.get(0));
+                        }
+                    }
+                };
+            }
+        });
+        bodySentColumn.setCellFactory(new Callback<>() {
+            @Override
+            public TableCell<Mail, String> call(TableColumn<Mail, String> column) {
+                return new TableCell<Mail, String>() {
+                    @Override
+                    protected void updateItem(String item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item == null || empty) {
+                            setText(null);
+                        } else {
+                            setText(item.replaceAll("\\<.*?>",""));
+                        }
+                    }
+                };
+            }
+        });
+        sentTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                if(event.getClickCount() == 2){
+                    Mail selectedMail = (Mail) sentTable.getSelectionModel().getSelectedItem();
+                    if(selectedMail!=null){
+                        try {
+                            openMail(selectedMail);
+                        } catch (IOException e) {
+                            showError("There has been an error opening the mail: "+e.getMessage());
+                        }
+                    }
+                }
+            }
+        });
+
+        sentTable.getItems().addAll(mailBox.getSent());
+    }
+
+    public void welcomeBag(Bag bag){
+        mailBox=(MailBox) bag.getPayload();
+        sessionManager.setMailBox(mailBox);
+        fullfillInbox();
+        fullfillSent();
     }
 
     public void openMail(Mail mail) throws IOException {
