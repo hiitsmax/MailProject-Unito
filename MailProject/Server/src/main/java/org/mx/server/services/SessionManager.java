@@ -13,6 +13,8 @@ import org.mx.post.entities.Mail;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class SessionManager {
     private Task<Void> serverTask;
@@ -77,6 +79,7 @@ public class SessionManager {
                             case LOGIN_CREDENTIALS -> resultBag=handleLogin(resultBag);
                             case MAIL_OUT -> resultBag=handleMailIn(resultBag);
                             case MAILBOX_DOWNLOAD -> resultBag=handleMailboxDownload(resultBag);
+                            case DELETE_MAIL -> resultBag=handleDeleteMail(resultBag);
                         }
                     // }
                     log("Object processed");
@@ -105,6 +108,10 @@ public class SessionManager {
         clientThread.start();
     }
 
+    private Bag handleDeleteMail(Bag incomingBag){
+        return new Bag<>(null, Bag.bagType.DELETE_MAIL, Bag.resultCode.SUCCESS);
+    }
+
     private Bag handleLogin(Bag incomingBag){
         log("Handling login...");
         if(incomingBag.getPayload() instanceof Account){
@@ -122,10 +129,50 @@ public class SessionManager {
         return null;
     }
 
+    private void returnMail(Mail mail, ArrayList<String> mailsToReturn){
+        Mail returnMail = new Mail();
+
+        returnMail.setBody("The email could not have been sent to: ");
+        for(String returnMailString:mailsToReturn){
+            returnMail.setBody(returnMail.getBody()+"</br>"+returnMailString);
+        }
+        returnMail.setBody(returnMail.getBody()+"</br>");
+        returnMail.setThreadUUID(mail.getThreadUUID());
+
+        returnMail.setTo(mail.getFrom());
+        returnMail.getTo().addAll(mail.getCCn());
+        returnMail.getTo().addAll(mail.getCC());
+
+        ArrayList<String> mailTo = new ArrayList<>(Arrays.asList("noreply@post.com"));
+        returnMail.setFrom(mailTo);
+
+        postalCenter.addMail(returnMail);
+    }
+
+    private void sanitizeMail(Mail mail){
+        ArrayList<String> mailsPresent = new ArrayList<>();
+        ArrayList<String> mailsNotPresent = new ArrayList<>();
+
+        for(String mailFrom: mail.getTo()){
+            if(postalCenter.isAccountPresent(mailFrom)){
+                mailsPresent.add(mailFrom);
+            }else{
+                log("Mail not found: "+mailFrom);
+                mailsNotPresent.add(mailFrom);
+            }
+        }
+
+        returnMail(mail, mailsNotPresent);
+        mail.setTo(mailsPresent);
+
+    }
+
     private Bag handleMailIn(Bag incomingBag){
         log("Handling incoming mail...");
         if(incomingBag.getPayload() instanceof Mail){
             Mail mail = (Mail)incomingBag.getPayload();
+            log("Sanitizing mail");
+            sanitizeMail(mail);
             log("Email put in the center");
             postalCenter.addMail(mail);
             return new Bag<>(null, Bag.bagType.NOTIFY_RESULT, Bag.resultCode.SUCCESS);
