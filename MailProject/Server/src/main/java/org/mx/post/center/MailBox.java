@@ -51,9 +51,25 @@ public class MailBox implements java.io.Serializable{
         MailBox resultBox = new MailBox();
         resultBox.setReceived(receivedDifference);
         resultBox.setCCed(ccedDifference);
-        resultBox.setReceived(receivedDifference);
+        resultBox.setSent(sentDifference);
 
         return resultBox;
+    }
+
+    public ArrayList<Mail> getMailThread(String uuid){
+        ArrayList<Mail> allMails = new ArrayList<>();
+        ArrayList<Mail> mailThread = new ArrayList<>();
+        allMails.addAll(sent);
+        allMails.addAll(received);
+        allMails.addAll(CCed);
+
+        for(Mail mail: allMails){
+            if(mail.getThreadUUID().equals(uuid)){
+                mailThread.add(mail);
+            }
+        }
+
+        return mailThread;
     }
 
     private ArrayList<Mail> getDifference(ArrayList<Mail> mailListA, ArrayList<Mail> mailListB){
@@ -61,14 +77,12 @@ public class MailBox implements java.io.Serializable{
         for(Mail thisMail: mailListA){
             boolean found = false;
             for(Mail otherMail: mailListB){
-                System.out.println("Checking "+thisMail.getUUID()+" with "+otherMail.getUUID());
                 if(thisMail.getUUID().equals(otherMail.getUUID())){
                     found=true;
                 }
             }
             if(!found){
                 difference.add(thisMail);
-                System.out.println("Mail "+thisMail.getUUID()+" added");
             }
         }
         return difference;

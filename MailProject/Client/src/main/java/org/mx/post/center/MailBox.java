@@ -56,6 +56,22 @@ public class MailBox implements java.io.Serializable{
         return resultBox;
     }
 
+    public ArrayList<Mail> getMailThread(String uuid){
+        ArrayList<Mail> allMails = new ArrayList<>();
+        ArrayList<Mail> mailThread = new ArrayList<>();
+        allMails.addAll(sent);
+        allMails.addAll(received);
+        allMails.addAll(CCed);
+
+        for(Mail mail: allMails){
+            if(mail.getThreadUUID().equals(uuid)){
+                mailThread.add(mail);
+            }
+        }
+
+        return mailThread;
+    }
+
     private ArrayList<Mail> getDifference(ArrayList<Mail> mailListA, ArrayList<Mail> mailListB){
         ArrayList<Mail> difference = new ArrayList<Mail>();
         for(Mail thisMail: mailListA){
