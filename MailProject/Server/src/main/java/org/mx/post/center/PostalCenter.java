@@ -37,12 +37,6 @@ public class PostalCenter implements java.io.Serializable{
     }
 
     public void addMail(Mail mail){
-        UUID uuid = UUID.randomUUID();
-
-        if(mail.getThreadStarter()){
-            mail.setThreadUUID(uuid.toString());
-        }
-        mail.setUUID(uuid.toString());
         mail.setSentDate(new Date());
         mailVault.addMail(mail);
     }

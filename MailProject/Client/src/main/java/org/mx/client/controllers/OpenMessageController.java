@@ -63,9 +63,43 @@ public class OpenMessageController {
 
     public void setMail(Mail mail){
         this.thisMail=mail;
-        messageWebView.getEngine().loadContent(mail.getBody());
+        mailBox=sessionManager.getMailBox();
+        String body="";
+
+        for(Mail singleMail : mailBox.getMailThread(thisMail.getThreadUUID())){
+            System.out.println(singleMail.getBody());
+            body+=getFormattedMail(singleMail);
+        }
+
+        messageWebView.getEngine().loadContent(body);
     }
 
+    private String getFormattedMail(Mail mailToFormat){
+        String formattedHTML = "";
+
+        formattedHTML+="<b>From: </b>";
+        for(String mail : mailToFormat.getFrom()){
+            formattedHTML+=mail+"; ";
+        }
+        formattedHTML+="</br>";
+
+        formattedHTML+="<b>To: </b>";
+        for(String mail : mailToFormat.getTo()){
+            formattedHTML+=mail+"; ";
+        }
+        formattedHTML+="</br>";
+
+        formattedHTML+="<b>CC: </b>";
+        for(String mail : mailToFormat.getCC()){
+            formattedHTML+=mail+"; ";
+        }
+        formattedHTML+="</br></br>";
+
+        formattedHTML+= mailToFormat.getBody();
+        formattedHTML+="</br><hr></br>";
+
+        return formattedHTML;
+    }
 
 
 }

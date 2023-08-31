@@ -229,7 +229,7 @@ public class HomeController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
 
         RefreshMailbox refreshService = new RefreshMailbox(sessionManager, inboxTable, sentTable);
-        refreshService.setPeriod(Duration.seconds(30)); // The interval between executions.
+        refreshService.setPeriod(Duration.seconds(1)); // The interval between executions.
         refreshService.start();
 
     }

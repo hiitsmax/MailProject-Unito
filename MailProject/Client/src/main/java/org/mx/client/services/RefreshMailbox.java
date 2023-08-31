@@ -37,17 +37,11 @@ public class RefreshMailbox extends ScheduledService<Void> {
 
                 inboxTable.getItems().addAll(mailsToNotify);
                 sentTable.getItems().addAll(difference.getSent());
-                System.out.println(mailsToNotify.size());
-                System.out.println(difference.getReceived().size());
 
                 for(Mail mail : mailsToNotify){
-                    //Here we should notify the whole thing
-                    System.out.println(mail);
                     Notifications.create().position(Pos.TOP_CENTER).text(mail.getBody().replaceAll("\\<.*?>","")).title(mail.getFrom().get(0)+mail.getSubject()).showWarning();
                 }
-                Platform.runLater(() -> {
-                    System.out.println("JJJJ");
-                });
+
                 return null;
             }
         };

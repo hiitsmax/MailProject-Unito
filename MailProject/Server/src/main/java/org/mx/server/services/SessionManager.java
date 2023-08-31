@@ -15,6 +15,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.UUID;
 
 public class SessionManager {
     private Task<Void> serverTask;
@@ -137,6 +138,8 @@ public class SessionManager {
             returnMail.setBody(returnMail.getBody()+"</br>"+returnMailString);
         }
         returnMail.setBody(returnMail.getBody()+"</br>");
+
+        uuidMail(returnMail);
         returnMail.setThreadUUID(mail.getThreadUUID());
 
         returnMail.setTo(mail.getFrom());
@@ -167,10 +170,21 @@ public class SessionManager {
 
     }
 
+    private void uuidMail(Mail mail){
+        UUID uuid = UUID.randomUUID();
+
+        if(mail.getThreadStarter()){
+            mail.setThreadUUID(uuid.toString());
+        }
+        mail.setUUID(uuid.toString());
+    }
+
     private Bag handleMailIn(Bag incomingBag){
         log("Handling incoming mail...");
         if(incomingBag.getPayload() instanceof Mail){
             Mail mail = (Mail)incomingBag.getPayload();
+            log("UUIDing mail");
+            uuidMail(mail);
             log("Sanitizing mail");
             sanitizeMail(mail);
             log("Email put in the center");
