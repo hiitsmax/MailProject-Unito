@@ -3,6 +3,7 @@ package org.mx.post.center;
 import org.mx.post.entities.Mail;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class MailBox implements java.io.Serializable{
     ArrayList<Mail> sent;
@@ -68,6 +69,13 @@ public class MailBox implements java.io.Serializable{
                 mailThread.add(mail);
             }
         }
+
+        mailThread.sort(new Comparator<Mail>() {
+            @Override
+            public int compare(Mail a, Mail b) {
+                return a.getSentDate().compareTo(b.getSentDate());
+            }
+        });
 
         return mailThread;
     }
