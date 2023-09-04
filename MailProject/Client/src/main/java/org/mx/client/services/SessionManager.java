@@ -34,6 +34,11 @@ public class SessionManager {
         Bag mailBag = new Bag<Mail>(mail, Bag.bagType.MAIL_OUT, Bag.resultCode.SUCCESS);
         return sendBag(mailBag);
     }
+    public Bag deleteMail(Mail mail) throws Exception {
+        mail.addMailWhoDeleted(account.getEmail());
+        Bag mailBag = new Bag<Mail>(mail, Bag.bagType.DELETE_MAIL, Bag.resultCode.SUCCESS);
+        return sendBag(mailBag);
+    }
 
     public MailBox refreshMailbox() throws Exception {
         Bag refreshBag = new Bag<Account>(account, Bag.bagType.MAILBOX_DOWNLOAD, Bag.resultCode.SUCCESS);

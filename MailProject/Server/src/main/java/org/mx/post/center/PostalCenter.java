@@ -38,12 +38,18 @@ public class PostalCenter implements java.io.Serializable{
 
     public void addMail(Mail mail){
         mail.setSentDate(new Date());
-        for(String toAdd : mail.getTo()){
-            System.out.println("ADD MAIL IN TO: "+toAdd);
-        }
         mailVault.addMail(mail);
     }
 
+    public void deleteMailFor(Mail mailToDelete){
+        for(Mail mail : mailVault.getMails()){
+            if(mail.equals(mailToDelete)){
+                for(String addressToDelete : mailToDelete.getMailWhoDeleted()){
+                    mail.addMailWhoDeleted(addressToDelete);
+                }
+            }
+        }
+    }
     public Account getAccountByEmail(String email){
         for (Account account : accountVault.getAccounts()) {
             if (account.getEmail().equals(email)) {

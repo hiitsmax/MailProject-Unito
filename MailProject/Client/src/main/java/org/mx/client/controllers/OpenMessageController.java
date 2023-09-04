@@ -18,7 +18,9 @@ import org.mx.post.entities.Mail;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 public class OpenMessageController {
     @FXML
@@ -62,6 +64,72 @@ public class OpenMessageController {
         }
     }
 
+    @FXML
+    private void onDeleteClick(){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete Mail");
+        alert.setHeaderText("Are you sure want to delete this mail?");
+
+        // option != null.
+        Optional<ButtonType> option = alert.showAndWait();
+
+        if (option.get() == ButtonType.OK) {
+
+            Stage thisStage = (Stage)forwardButton.getScene().getWindow();
+            thisStage.close();
+
+            try {
+                sessionManager.deleteMail(thisMail);
+            } catch (Exception e) {
+                showError(e.getMessage());
+            }
+        }
+
+    }
+
+    @FXML
+    private void onReplyClick(){
+        Mail replyMail = new Mail();
+
+        replyMail.setTo(thisMail.getFrom());
+        replyMail.setFrom(new ArrayList<String>(Arrays.asList(new String[]{sessionManager.getAccount().getEmail()})));
+        replyMail.setCCn(new ArrayList<String>());
+        replyMail.setThreadUUID(thisMail.getThreadUUID());
+        replyMail.setThreadStarter(false);
+
+        String body="</br></br>";
+        body+=getThreadBoxHTML(thisMail);
+
+        replyMail.setBody(body);
+
+        try {
+            openNewMail(replyMail);
+        } catch (IOException e) {
+            showError("There has been an error opening the mail: "+e.getMessage());
+        }
+    }
+    @FXML
+    private void onReplyAllClick(){
+        Mail replyMail = new Mail();
+
+        replyMail.setTo(thisMail.getFrom());
+        replyMail.setCC(thisMail.getCC());
+        replyMail.setCCn(new ArrayList<String>());
+        replyMail.setFrom(new ArrayList<String>(Arrays.asList(new String[]{sessionManager.getAccount().getEmail()})));
+        replyMail.setThreadUUID(thisMail.getThreadUUID());
+        replyMail.setThreadStarter(false);
+
+        String body="</br></br>";
+        body+=getThreadBoxHTML(thisMail);
+
+        replyMail.setBody(body);
+
+        try {
+            openNewMail(replyMail);
+        } catch (IOException e) {
+            showError("There has been an error opening the mail: "+e.getMessage());
+        }
+    }
     private void showAlert(String message){
         Alert alert = new Alert(Alert.AlertType.WARNING);
 
@@ -153,7 +221,7 @@ public class OpenMessageController {
         Boolean showBox=false;
         ArrayList<Mail> mailTrace = new ArrayList<>();
         for(Mail singleMail : mailBox.getMailThread(thisMail.getThreadUUID())){
-            if(!Objects.equals(singleMail.getUUID(), mailToFormat.getUUID()) && !(mailTrace.contains(singleMail))){
+            if(!Objects.equals(singleMail.getUUID(), mailToFormat.getUUID()) && !(mailTrace.contains(singleMail)) && singleMail.getSentDate().compareTo(mailToFormat.getSentDate())<0){
                 showBox=true;
                 body+=getFormattedMail(singleMail,0);
                 body+="</br><hr></br>";

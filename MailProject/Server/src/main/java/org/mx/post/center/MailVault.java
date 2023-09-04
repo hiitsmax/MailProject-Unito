@@ -29,7 +29,7 @@ public class MailVault  implements java.io.Serializable{
     public ArrayList<Mail> getMailSentBy(Account sender){
         ArrayList<Mail> sentBy = new ArrayList<Mail>();
         for (Mail mail : mails) {
-            if (mail.getFrom().contains(sender.getEmail())) {
+            if (mail.getFrom().contains(sender.getEmail()) && mail.shouldIGiveThisMailTo(sender.getEmail())) {
                 sentBy.add(mail);
             }
         }
@@ -39,7 +39,7 @@ public class MailVault  implements java.io.Serializable{
     public ArrayList<Mail> getMailSentTo(Account receiver){
         ArrayList<Mail> sentTo = new ArrayList<Mail>();
         for (Mail mail : mails) {
-            if (mail.getTo().contains(receiver.getEmail())) {
+            if (mail.getTo().contains(receiver.getEmail()) && mail.shouldIGiveThisMailTo(receiver.getEmail())) {
                 sentTo.add(mail);
             }
         }
@@ -49,7 +49,7 @@ public class MailVault  implements java.io.Serializable{
     public ArrayList<Mail> getMailCCedTo(Account receiver){
         ArrayList<Mail> CCedTo = new ArrayList<Mail>();
         for (Mail mail : mails) {
-            if (mail.getCC().contains(receiver.getEmail())) {
+            if (mail.getCC().contains(receiver.getEmail()) && mail.shouldIGiveThisMailTo(receiver.getEmail())) {
                 CCedTo.add(mail);
             }
         }

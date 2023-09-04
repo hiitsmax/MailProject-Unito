@@ -110,6 +110,11 @@ public class SessionManager {
     }
 
     private Bag handleDeleteMail(Bag incomingBag){
+        Mail mailToDelete = new Mail();
+        if(incomingBag.getPayload() instanceof Mail){
+            mailToDelete = (Mail)incomingBag.getPayload();
+        }
+        postalCenter.deleteMailFor(mailToDelete);
         return new Bag<>(null, Bag.bagType.DELETE_MAIL, Bag.resultCode.SUCCESS);
     }
 
@@ -188,13 +193,12 @@ public class SessionManager {
         if(incomingBag.getPayload() instanceof Mail){
             Mail mail = (Mail)incomingBag.getPayload();
             log("UUIDing mail");
+            System.out.println("UUID BEFORE " + mail.getThreadUUID());
             uuidMail(mail);
+            System.out.println("UUID AFTER " + mail.getThreadUUID());
             log("Sanitizing mail");
             sanitizeMail(mail);
             log("Email put in the center");
-            for(String toAdd : mail.getTo()){
-                System.out.println("HANDLE MAIL IN TO: "+toAdd);
-            }
             postalCenter.addMail(mail);
             return new Bag<>(null, Bag.bagType.NOTIFY_RESULT, Bag.resultCode.SUCCESS);
         }else{

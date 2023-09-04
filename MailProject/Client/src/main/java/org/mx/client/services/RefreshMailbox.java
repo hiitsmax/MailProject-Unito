@@ -29,8 +29,21 @@ public class RefreshMailbox extends ScheduledService<Void> {
         return new Task<Void>(){
             @Override
             protected Void call() throws Exception {
+                MailBox oldMailBox = sessionManager.getMailBox();
                 MailBox difference = sessionManager.refreshMailbox();
+                MailBox newMailBox = sessionManager.getMailBox();
                 ArrayList<Mail> mailsToNotify = new ArrayList();
+
+                MailBox mailsToRemove = oldMailBox.getDifferenceFrom(newMailBox);
+                for(Mail mailToRemove : mailsToRemove.getCCed()){
+                    inboxTable.getItems().remove(mailToRemove);
+                }
+                for(Mail mailToRemove : mailsToRemove.getSent()){
+                    inboxTable.getItems().remove(mailToRemove);
+                }
+                for(Mail mailToRemove : mailsToRemove.getSent()){
+                    sentTable.getItems().remove(mailToRemove);
+                }
 
                 mailsToNotify.addAll(difference.getCCed());
                 mailsToNotify.addAll(difference.getReceived());
@@ -41,6 +54,8 @@ public class RefreshMailbox extends ScheduledService<Void> {
                 for(Mail mail : mailsToNotify){
                     Notifications.create().position(Pos.TOP_CENTER).text(mail.getBody().replaceAll("\\<.*?>","")).title(mail.getFrom().get(0)+mail.getSubject()).showWarning();
                 }
+
+
 
                 return null;
             }

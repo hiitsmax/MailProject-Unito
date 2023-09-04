@@ -9,7 +9,12 @@ public class Mail implements java.io.Serializable{
     Boolean isThreadStarter=true;
     String body;
     String subject;
-
+    ArrayList<String> To;
+    ArrayList<String> CC;
+    ArrayList<String> CCn;
+    ArrayList<String> From;
+    Date SentDate;
+    ArrayList<String> mailsWhoDeletedThisMail = new ArrayList<>();
     public String getSubject() {
         return subject;
     }
@@ -17,13 +22,15 @@ public class Mail implements java.io.Serializable{
     public void setSubject(String subject) {
         this.subject = subject;
     }
-
-    ArrayList<String> To;
-    ArrayList<String> CC;
-    ArrayList<String> CCn;
-    ArrayList<String> From;
-    Date SentDate;
-
+    public void addMailWhoDeleted(String mail){
+        mailsWhoDeletedThisMail.add(mail);
+    }
+    public ArrayList<String> getMailWhoDeleted(){
+        return mailsWhoDeletedThisMail;
+    }
+    public boolean shouldIGiveThisMailTo(String mail){
+        return mailsWhoDeletedThisMail.contains(mail);
+    }
     public String getUUID() {
         return UUID;
     }
@@ -111,5 +118,12 @@ public class Mail implements java.io.Serializable{
         this.To = new ArrayList<>();
         this.CC = new ArrayList<>();
         this.From = new ArrayList<>();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Mail mailToCheck = new Mail();
+        if(obj instanceof Mail) mailToCheck = (Mail)obj;
+        return UUID.equals(mailToCheck.getUUID());
     }
 }

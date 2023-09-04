@@ -66,17 +66,20 @@ public class NewMessageController implements Initializable {
         this.sessionManager=sessionManager;
     }
 
-    public void setMail(Mail mail){
-        for (String address : mail.getTo()){
+    public void setMail(Mail mailToSet){
+        for (String address : mailToSet.getTo()){
             toField.setText(toField.getText()+address+";");
         }
-        for (String address : mail.getCC()){
+        for (String address : mailToSet.getCC()){
             ccField.setText(ccField.getText()+address+";");
         }
-        for (String address : mail.getCCn()){
+        for (String address : mailToSet.getCCn()){
             ccnField.setText(ccnField.getText()+address+";");
         }
-        editHTMLEditor.setHtmlText(mail.getBody());
+        mail.setUUID(mailToSet.getUUID());
+        mail.setThreadUUID(mailToSet.getThreadUUID());
+        mail.setThreadStarter(mailToSet.getThreadStarter());
+        editHTMLEditor.setHtmlText(mailToSet.getBody());
     }
 
     @FXML
