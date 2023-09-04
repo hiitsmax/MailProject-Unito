@@ -143,13 +143,16 @@ public class SessionManager {
         returnMail.setThreadUUID(mail.getThreadUUID());
 
         returnMail.setTo(mail.getFrom());
+        // To review, it can expose ccn
         returnMail.getTo().addAll(mail.getCCn());
         returnMail.getTo().addAll(mail.getCC());
 
         ArrayList<String> mailTo = new ArrayList<>(Arrays.asList("noreply@post.com"));
         returnMail.setFrom(mailTo);
 
-        postalCenter.addMail(returnMail);
+
+        if(!mailsToReturn.isEmpty())
+            postalCenter.addMail(returnMail);
     }
 
     private void sanitizeMail(Mail mail){
@@ -157,6 +160,7 @@ public class SessionManager {
         ArrayList<String> mailsNotPresent = new ArrayList<>();
 
         for(String mailFrom: mail.getTo()){
+            System.out.println("SANITIZE TO: " + mailFrom);
             if(postalCenter.isAccountPresent(mailFrom)){
                 mailsPresent.add(mailFrom);
             }else{
@@ -188,6 +192,9 @@ public class SessionManager {
             log("Sanitizing mail");
             sanitizeMail(mail);
             log("Email put in the center");
+            for(String toAdd : mail.getTo()){
+                System.out.println("HANDLE MAIL IN TO: "+toAdd);
+            }
             postalCenter.addMail(mail);
             return new Bag<>(null, Bag.bagType.NOTIFY_RESULT, Bag.resultCode.SUCCESS);
         }else{

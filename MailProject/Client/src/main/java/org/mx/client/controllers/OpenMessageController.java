@@ -16,7 +16,9 @@ import org.mx.post.center.MailBox;
 import org.mx.post.entities.Bag;
 import org.mx.post.entities.Mail;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class OpenMessageController {
     @FXML
@@ -31,12 +33,34 @@ public class OpenMessageController {
     private TableColumn<Mail, String> bodyInboxColumn;
     @FXML
     private WebView messageWebView;
+    @FXML
+    private Button forwardButton;
 
     private SessionManager sessionManager;
     private MailBox mailBox;
     private Mail thisMail;
 
+    @FXML
+    private void onForwardClick(){
+        Mail forwardMail = new Mail();
 
+        forwardMail.setTo(new ArrayList<String>());
+        forwardMail.setCC(new ArrayList<String>());
+        forwardMail.setCCn(new ArrayList<String>());
+
+        String body="</br></br><hr>";
+        body+=getFormattedMail(thisMail,0);
+        body+="</br></br>";
+        body+=getThreadHTML(thisMail);
+
+        forwardMail.setBody(body);
+
+        try {
+            openNewMail(forwardMail);
+        } catch (IOException e) {
+            showError("There has been an error opening the mail: "+e.getMessage());
+        }
+    }
 
     private void showAlert(String message){
         Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -66,16 +90,18 @@ public class OpenMessageController {
         mailBox=sessionManager.getMailBox();
         String body="";
 
-        for(Mail singleMail : mailBox.getMailThread(thisMail.getThreadUUID())){
-            System.out.println(singleMail.getBody());
-            body+=getFormattedMail(singleMail);
-        }
+        body+=getFormattedMail(mail,0);
+        body+=getThreadBoxHTML(mail);
+
+        body=body.replace("contenteditable=\"true\"", "contenteditable=\"false\"");
+
 
         messageWebView.getEngine().loadContent(body);
     }
 
-    private String getFormattedMail(Mail mailToFormat){
-        String formattedHTML = "";
+    private String getFormattedMail(Mail mailToFormat, int marginPixel){
+
+        String formattedHTML = "<div style=\"margin-left:"+marginPixel+"px\">";
 
         formattedHTML+="<b>From: </b>";
         for(String mail : mailToFormat.getFrom()){
@@ -93,12 +119,96 @@ public class OpenMessageController {
         for(String mail : mailToFormat.getCC()){
             formattedHTML+=mail+"; ";
         }
+        formattedHTML+="</br>";
+
+        formattedHTML+="<b>Subject: </b>";
+        formattedHTML+=mailToFormat.getSubject();
+        formattedHTML+="</br>";
+
+        formattedHTML+="<b>Datetime: </b>";
+        formattedHTML+=mailToFormat.getSentDate().toString();
+        formattedHTML+="</br>";
+
+        // DEBUGG
+        formattedHTML+="<b>UUID: </b>";
+        formattedHTML+=mailToFormat.getUUID().toString();
+        formattedHTML+="</br>";
+
+        formattedHTML+="<b>Thread-UUID: </b>";
+        formattedHTML+=mailToFormat.getThreadUUID().toString();
+        formattedHTML+="</br>";
+
         formattedHTML+="</br></br>";
 
-        formattedHTML+= mailToFormat.getBody();
-        formattedHTML+="</br><hr></br>";
+        formattedHTML+=mailToFormat.getBody();
+
+        formattedHTML+="</div>";
+
 
         return formattedHTML;
+    }
+
+    private String getThreadBoxHTML(Mail mailToFormat){
+        String body="";
+        Boolean showBox=false;
+        ArrayList<Mail> mailTrace = new ArrayList<>();
+        for(Mail singleMail : mailBox.getMailThread(thisMail.getThreadUUID())){
+            if(!Objects.equals(singleMail.getUUID(), mailToFormat.getUUID()) && !(mailTrace.contains(singleMail))){
+                showBox=true;
+                body+=getFormattedMail(singleMail,0);
+                body+="</br><hr></br>";
+                mailTrace.add(singleMail);
+            }
+        }
+        if(showBox){
+            body += "<div><script>function press"+mailToFormat.getUUID().replace("-","")+"(){" +
+                "if(document.getElementById(\"threadContainer"+mailToFormat.getUUID().replace("-","")+"\").style.display===\"none\"){" +
+                "document.getElementById(\"threadContainer"+mailToFormat.getUUID().replace("-","")+"\").style.display=\"block\"}" +
+                "else{" +
+                "document.getElementById(\"threadContainer"+mailToFormat.getUUID().replace("-","")+"\").style.display=\"none\"}" +
+                "}" +
+                "</script></div>";
+            String boxString = "<div onclick= \"press"+mailToFormat.getUUID().replace("-","")+"()\" style=\"user-select:none; width:2em; height:1em; border: solid 1px black; border-radius:20px; background-color: grey;" +
+                    "display:flex; align-items:center; justify-content:center; cursor:pointer;\"><span style=\"color:white\">...</span></div>";
+            body = boxString + "<div style=\"display:none; margin-left:8px;\" id=\"threadContainer"+mailToFormat.getUUID().replace("-","")+"\" >" + body + "</div>";
+
+        }
+        return body;
+    }
+
+    private String getThreadHTML(Mail mailToFormat){
+
+        String body="";
+        Boolean showBox=false;
+        ArrayList<Mail> mailTrace = new ArrayList<>();
+
+        for(Mail singleMail : mailBox.getMailThread(thisMail.getThreadUUID())){
+            if(!Objects.equals(singleMail.getUUID(), mailToFormat.getUUID()) && !(mailTrace.contains(singleMail))){
+                showBox=true;
+                body+=getFormattedMail(singleMail, 16);
+                body+="</br><hr></br>";
+                mailTrace.add(singleMail);
+            }
+        }
+
+        return body;
+    }
+
+
+    public void openNewMail(Mail mailToStart) throws IOException {
+        NewMessageController newMessageController = new NewMessageController();
+
+        FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("new-view.fxml"));
+        fxmlLoader.setController(newMessageController);
+        newMessageController.setSessionManager(sessionManager);
+
+        Scene scene = new Scene(fxmlLoader.load());
+        Stage secondStage = new Stage();
+        secondStage.setTitle("New message");
+        secondStage.setScene(scene);
+        secondStage.show();
+
+        newMessageController.setMail(mailToStart);
     }
 
 

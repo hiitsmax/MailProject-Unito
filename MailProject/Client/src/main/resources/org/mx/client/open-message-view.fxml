@@ -20,7 +20,7 @@
    <children>
       <ToolBar prefHeight="64.0" prefWidth="200.0">
          <items>
-            <Button fx:id="replyButton" mnemonicParsing="false" text="Reply">
+            <Button fx:id="replyButton" mnemonicParsing="false" onAction="#onReplyClick" text="Reply">
                <graphic>
                   <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -29,7 +29,16 @@
                   </ImageView>
                </graphic>
             </Button>
-            <Button fx:id="forwardButton" mnemonicParsing="false" text="Forward">
+            <Button fx:id="replyAllButton" mnemonicParsing="false" onAction="#onReplyAllClick" text="Reply all">
+               <graphic>
+                  <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@icons/icons8-inviare-e-mail-di-massa-64.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </Button>
+            <Button fx:id="forwardButton" mnemonicParsing="false" onAction="#onForwardClick" text="Forward">
                <graphic>
                   <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                      <image>

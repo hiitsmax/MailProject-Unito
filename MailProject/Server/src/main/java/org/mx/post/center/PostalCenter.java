@@ -38,6 +38,9 @@ public class PostalCenter implements java.io.Serializable{
 
     public void addMail(Mail mail){
         mail.setSentDate(new Date());
+        for(String toAdd : mail.getTo()){
+            System.out.println("ADD MAIL IN TO: "+toAdd);
+        }
         mailVault.addMail(mail);
     }
 

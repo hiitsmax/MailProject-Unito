@@ -16,6 +16,9 @@ public class MailVault  implements java.io.Serializable{
     }
 
     public void addMail(Mail mail) {
+        for(String toAdd : mail.getTo()){
+            System.out.println("MAILVAULT IN TO: "+toAdd);
+        }
         mails.add(mail);
     }
 

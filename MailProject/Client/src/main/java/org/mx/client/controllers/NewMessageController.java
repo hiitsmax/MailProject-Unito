@@ -67,7 +67,16 @@ public class NewMessageController implements Initializable {
     }
 
     public void setMail(Mail mail){
-        System.out.println(mail.getBody());
+        for (String address : mail.getTo()){
+            toField.setText(toField.getText()+address+";");
+        }
+        for (String address : mail.getCC()){
+            ccField.setText(ccField.getText()+address+";");
+        }
+        for (String address : mail.getCCn()){
+            ccnField.setText(ccnField.getText()+address+";");
+        }
+        editHTMLEditor.setHtmlText(mail.getBody());
     }
 
     @FXML
@@ -79,16 +88,34 @@ public class NewMessageController implements Initializable {
         }
     }
 
+    private void cleanMailArray(ArrayList<String> mailList){
+        for(int i=0; i<mailList.size(); i++){
+            if(mailList.get(i).isEmpty() || mailList.get(i).equals(" ")){
+                mailList.remove(i);
+            }
+        }
+    }
+
+    private void cleanMailAddresses(Mail mailToClean){
+        cleanMailArray(mailToClean.getTo());
+        cleanMailArray(mailToClean.getCCn());
+        cleanMailArray(mailToClean.getCC());
+    }
+
     public void sendMail(){
         ArrayList<String> to =  new ArrayList<>(Arrays.asList(toField.getText().split(";")));
         ArrayList<String> cc = new ArrayList<>(Arrays.asList(ccField.getText().split(";")));
         ArrayList<String> ccn = new ArrayList<>(Arrays.asList(ccnField.getText().split(";")));
+
         mail.setCC(cc);
         mail.setCCn(ccn);
         mail.setTo(to);
         mail.setFrom(new ArrayList<String>(Collections.singletonList(sessionManager.getAccount().getEmail())));
         mail.setBody(editHTMLEditor.getHtmlText());
         mail.setSubject(subjectField.getText());
+
+        cleanMailAddresses(mail);
+
         Task<Bag> sendTask = new Task<Bag>() {
             @Override
             protected Bag call() throws Exception {
