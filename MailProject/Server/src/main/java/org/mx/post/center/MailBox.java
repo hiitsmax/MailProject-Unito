@@ -3,8 +3,6 @@ package org.mx.post.center;
 import org.mx.post.entities.Mail;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 
 public class MailBox implements java.io.Serializable{
     ArrayList<Mail> sent;
@@ -58,25 +56,38 @@ public class MailBox implements java.io.Serializable{
         return resultBox;
     }
 
-    public ArrayList<Mail> getMailThread(String uuid){
+    public ArrayList<Mail> getMailThread(Mail mail, Boolean includeThisMail){
         ArrayList<Mail> allMails = new ArrayList<>();
         ArrayList<Mail> mailThread = new ArrayList<>();
         allMails.addAll(sent);
         allMails.addAll(received);
         allMails.addAll(CCed);
 
-        for(Mail mail: allMails){
-            if(mail.getThreadUUID().equals(uuid)){
-                mailThread.add(mail);
+        Mail lastMail=mail;
+        Boolean found=true;
+        while(found){
+            found = false;
+            for(Mail singleMail: allMails){
+                System.out.println("SINGLE MAIL "+singleMail.getLastMailUUID());
+                if(singleMail.getUUID().equals(lastMail.getLastMailUUID())){
+                    System.out.println("TRUE");
+                    mailThread.add(singleMail);
+                    lastMail=singleMail;
+                    found=true;
+                }
             }
         }
+            if(includeThisMail)
+                mailThread.add(0, mail);
 
-        mailThread.sort(new Comparator<Mail>() {
+
+
+        /*mailThread.sort(new Comparator<Mail>() {
             @Override
             public int compare(Mail a, Mail b) {
                 return a.getSentDate().compareTo(b.getSentDate());
             }
-        });
+        });*/
 
         return mailThread;
     }

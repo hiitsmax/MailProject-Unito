@@ -79,6 +79,7 @@ public class NewMessageController implements Initializable {
         mail.setUUID(mailToSet.getUUID());
         mail.setThreadUUID(mailToSet.getThreadUUID());
         mail.setThreadStarter(mailToSet.getThreadStarter());
+        mail.setLastMailUUID(mailToSet.getLastMailUUID());
         editHTMLEditor.setHtmlText(mailToSet.getBody());
     }
 

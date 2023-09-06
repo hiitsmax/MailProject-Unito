@@ -15,6 +15,7 @@ public class Mail implements java.io.Serializable{
     ArrayList<String> From;
     Date SentDate;
     ArrayList<String> mailsWhoDeletedThisMail = new ArrayList<>();
+    String lastMailUUID;
     public String getSubject() {
         return subject;
     }
@@ -29,7 +30,7 @@ public class Mail implements java.io.Serializable{
         return mailsWhoDeletedThisMail;
     }
     public boolean shouldIGiveThisMailTo(String mail){
-        return !(mailsWhoDeletedThisMail.contains(mail));
+        return !mailsWhoDeletedThisMail.contains(mail);
     }
     public String getUUID() {
         return UUID;
@@ -112,12 +113,22 @@ public class Mail implements java.io.Serializable{
         this.CC = CC;
         From = from;
         SentDate = sentDate;
+        lastMailUUID="";
     }
 
     public Mail(){
         this.To = new ArrayList<>();
         this.CC = new ArrayList<>();
         this.From = new ArrayList<>();
+        lastMailUUID="";
+    }
+
+    public String getLastMailUUID() {
+        return lastMailUUID;
+    }
+
+    public void setLastMailUUID(String lastMailUUID) {
+        this.lastMailUUID = lastMailUUID;
     }
 
     @Override

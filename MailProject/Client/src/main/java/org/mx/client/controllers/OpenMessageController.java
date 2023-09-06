@@ -49,8 +49,9 @@ public class OpenMessageController {
         forwardMail.setTo(new ArrayList<String>());
         forwardMail.setCC(new ArrayList<String>());
         forwardMail.setCCn(new ArrayList<String>());
+        forwardMail.setSubject(thisMail.getSubject());
 
-        String body="</br></br><hr>";
+        String body="</br></br><hr><h3>Forwarded message</h3></h3>";
         body+=getFormattedMail(thisMail,0);
         body+="</br></br>";
         body+=getThreadHTML(thisMail);
@@ -96,9 +97,11 @@ public class OpenMessageController {
         replyMail.setCCn(new ArrayList<String>());
         replyMail.setThreadUUID(thisMail.getThreadUUID());
         replyMail.setThreadStarter(false);
+        replyMail.setLastMailUUID(thisMail.getUUID());
+        replyMail.setSubject(thisMail.getSubject());
 
         String body="</br></br>";
-        body+=getThreadBoxHTML(thisMail);
+        body+=getThreadBoxHTML(thisMail, false, true);
 
         replyMail.setBody(body);
 
@@ -118,9 +121,11 @@ public class OpenMessageController {
         replyMail.setFrom(new ArrayList<String>(Arrays.asList(new String[]{sessionManager.getAccount().getEmail()})));
         replyMail.setThreadUUID(thisMail.getThreadUUID());
         replyMail.setThreadStarter(false);
+        replyMail.setLastMailUUID(thisMail.getUUID());
+        replyMail.setSubject(thisMail.getSubject());
 
         String body="</br></br>";
-        body+=getThreadBoxHTML(thisMail);
+        body+=getThreadBoxHTML(thisMail, false, true);
 
         replyMail.setBody(body);
 
@@ -159,7 +164,9 @@ public class OpenMessageController {
         String body="";
 
         body+=getFormattedMail(mail,0);
-        body+=getThreadBoxHTML(mail);
+        body+="<br><hr><h3>Thread</h3><br>";
+        if(!(mailBox.getMailThread(mail, false).isEmpty()))
+            body+=getThreadHTML(mail);
 
         body=body.replace("contenteditable=\"true\"", "contenteditable=\"false\"");
 
@@ -206,6 +213,10 @@ public class OpenMessageController {
         formattedHTML+=mailToFormat.getThreadUUID().toString();
         formattedHTML+="</br>";
 
+        formattedHTML+="<b>Last-Mail-UUID: </b>";
+        formattedHTML+=mailToFormat.getLastMailUUID().toString();
+        formattedHTML+="</br>";
+
         formattedHTML+="</br></br>";
 
         formattedHTML+=mailToFormat.getBody();
@@ -216,12 +227,12 @@ public class OpenMessageController {
         return formattedHTML;
     }
 
-    private String getThreadBoxHTML(Mail mailToFormat){
+    private String getThreadBoxHTML(Mail mailToFormat, boolean isExpanded, boolean includeThis){
         String body="";
         Boolean showBox=false;
         ArrayList<Mail> mailTrace = new ArrayList<>();
-        for(Mail singleMail : mailBox.getMailThread(thisMail.getThreadUUID())){
-            if(!Objects.equals(singleMail.getUUID(), mailToFormat.getUUID()) && !(mailTrace.contains(singleMail)) && singleMail.getSentDate().compareTo(mailToFormat.getSentDate())<0){
+        for(Mail singleMail : mailBox.getMailThread(thisMail, includeThis)){
+            if(!(mailTrace.contains(singleMail)) && singleMail.getSentDate().compareTo(mailToFormat.getSentDate())<=0){
                 showBox=true;
                 body+=getFormattedMail(singleMail,0);
                 body+="</br><hr></br>";
@@ -238,7 +249,7 @@ public class OpenMessageController {
                 "</script></div>";
             String boxString = "<div onclick= \"press"+mailToFormat.getUUID().replace("-","")+"()\" style=\"user-select:none; width:2em; height:1em; border: solid 1px black; border-radius:20px; background-color: grey;" +
                     "display:flex; align-items:center; justify-content:center; cursor:pointer;\"><span style=\"color:white\">...</span></div>";
-            body = boxString + "<div style=\"display:none; margin-left:8px;\" id=\"threadContainer"+mailToFormat.getUUID().replace("-","")+"\" >" + body + "</div>";
+            body = boxString + "<div style=\"display:"+(isExpanded?"block":"none")+"; margin-left:8px;\" id=\"threadContainer"+mailToFormat.getUUID().replace("-","")+"\" >" + body + "</div>";
 
         }
         return body;
@@ -250,7 +261,7 @@ public class OpenMessageController {
         Boolean showBox=false;
         ArrayList<Mail> mailTrace = new ArrayList<>();
 
-        for(Mail singleMail : mailBox.getMailThread(thisMail.getThreadUUID())){
+        for(Mail singleMail : mailBox.getMailThread(thisMail, false)){
             if(!Objects.equals(singleMail.getUUID(), mailToFormat.getUUID()) && !(mailTrace.contains(singleMail))){
                 showBox=true;
                 body+=getFormattedMail(singleMail, 16);
