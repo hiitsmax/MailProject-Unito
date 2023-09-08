@@ -17,10 +17,7 @@ import org.mx.post.entities.Bag;
 import org.mx.post.entities.Mail;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public class OpenMessageController {
     @FXML
@@ -92,7 +89,11 @@ public class OpenMessageController {
     private void onReplyClick(){
         Mail replyMail = new Mail();
 
-        replyMail.setTo(thisMail.getFrom());
+        ArrayList<String> to = new ArrayList<>();
+
+        to.addAll(thisMail.getFrom());
+
+        replyMail.setTo(to);
         replyMail.setFrom(new ArrayList<String>(Arrays.asList(new String[]{sessionManager.getAccount().getEmail()})));
         replyMail.setCCn(new ArrayList<String>());
         replyMail.setThreadUUID(thisMail.getThreadUUID());
@@ -115,8 +116,24 @@ public class OpenMessageController {
     private void onReplyAllClick(){
         Mail replyMail = new Mail();
 
-        replyMail.setTo(thisMail.getFrom());
-        replyMail.setCC(thisMail.getCC());
+        ArrayList<String> to = new ArrayList<>();
+        ArrayList<String> cc = new ArrayList<>();
+
+        to.addAll(thisMail.getFrom());
+        for(String mailToAdd :  thisMail.getTo()){
+            if(!(mailToAdd.equals(sessionManager.getAccount().getEmail()))) {
+                to.add(mailToAdd);
+            }
+        }
+
+        for(String mailToAdd :  thisMail.getCC()){
+            if(!(mailToAdd.equals(sessionManager.getAccount().getEmail()))) {
+                cc.add(mailToAdd);
+            }
+        }
+
+        replyMail.setTo(to);
+        replyMail.setCC(cc);
         replyMail.setCCn(new ArrayList<String>());
         replyMail.setFrom(new ArrayList<String>(Arrays.asList(new String[]{sessionManager.getAccount().getEmail()})));
         replyMail.setThreadUUID(thisMail.getThreadUUID());
@@ -164,18 +181,20 @@ public class OpenMessageController {
         String body="";
 
         body+=getFormattedMail(mail,0);
-        body+="<br><hr><h3>Thread</h3><br>";
-        if(!(mailBox.getMailThread(mail, false).isEmpty()))
+        if(!(mailBox.getMailThread(mail, false).isEmpty())){
+            body+="<br><hr><h3>Thread</h3><br>";
             body+=getThreadHTML(mail);
+        }
 
         body=body.replace("contenteditable=\"true\"", "contenteditable=\"false\"");
 
-
+        System.out.println("\n");
+        System.out.println(body);
+        System.out.println("\n");
         messageWebView.getEngine().loadContent(body);
     }
 
     private String getFormattedMail(Mail mailToFormat, int marginPixel){
-
         String formattedHTML = "<div style=\"margin-left:"+marginPixel+"px\">";
 
         formattedHTML+="<b>From: </b>";
@@ -205,7 +224,7 @@ public class OpenMessageController {
         formattedHTML+="</br>";
 
         // DEBUGG
-        formattedHTML+="<b>UUID: </b>";
+        /*formattedHTML+="<b>UUID: </b>";
         formattedHTML+=mailToFormat.getUUID().toString();
         formattedHTML+="</br>";
 
@@ -215,7 +234,7 @@ public class OpenMessageController {
 
         formattedHTML+="<b>Last-Mail-UUID: </b>";
         formattedHTML+=mailToFormat.getLastMailUUID().toString();
-        formattedHTML+="</br>";
+        formattedHTML+="</br>";*/
 
         formattedHTML+="</br></br>";
 
@@ -240,17 +259,20 @@ public class OpenMessageController {
             }
         }
         if(showBox){
-            body += "<div><script>function press"+mailToFormat.getUUID().replace("-","")+"(){" +
-                "if(document.getElementById(\"threadContainer"+mailToFormat.getUUID().replace("-","")+"\").style.display===\"none\"){" +
-                "document.getElementById(\"threadContainer"+mailToFormat.getUUID().replace("-","")+"\").style.display=\"block\"}" +
+            String uniqueUUID = UUID.randomUUID().toString().replace("-","");
+            uniqueUUID+=mailToFormat.getUUID().replace("-","");
+            body+="<div>";
+            body += "<script>function press"+uniqueUUID+"(){" +
+                "if(document.getElementById(\"threadContainer"+uniqueUUID+"\").style.display===\"none\"){" +
+                "document.getElementById(\"threadContainer"+uniqueUUID+"\").style.display=\"block\"}" +
                 "else{" +
-                "document.getElementById(\"threadContainer"+mailToFormat.getUUID().replace("-","")+"\").style.display=\"none\"}" +
+                "document.getElementById(\"threadContainer"+uniqueUUID+"\").style.display=\"none\"}" +
                 "}" +
-                "</script></div>";
-            String boxString = "<div onclick= \"press"+mailToFormat.getUUID().replace("-","")+"()\" style=\"user-select:none; width:2em; height:1em; border: solid 1px black; border-radius:20px; background-color: grey;" +
+                "</script>";
+            String boxString = "<div onclick= \"press"+uniqueUUID+"()\" style=\"user-select:none; width:2em; height:1em; border: solid 1px black; border-radius:20px; background-color: grey;" +
                     "display:flex; align-items:center; justify-content:center; cursor:pointer;\"><span style=\"color:white\">...</span></div>";
-            body = boxString + "<div style=\"display:"+(isExpanded?"block":"none")+"; margin-left:8px;\" id=\"threadContainer"+mailToFormat.getUUID().replace("-","")+"\" >" + body + "</div>";
-
+            body = boxString + "<div style=\"display:"+(isExpanded?"block":"none")+"; margin-left:8px;\" id=\"threadContainer"+uniqueUUID+"\" >" + body + "</div>";
+            body+="</div>";
         }
         return body;
     }

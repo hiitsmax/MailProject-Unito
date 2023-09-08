@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.ResourceBundle;
+import java.util.regex.*;
 
 public class NewMessageController implements Initializable {
     @FXML
@@ -36,7 +37,6 @@ public class NewMessageController implements Initializable {
     private TableColumn<Mail, ArrayList<String>> fromInboxColumn;
     @FXML
     private TableColumn<Mail, String> bodyInboxColumn;
-
     private SessionManager sessionManager;
     private MailBox mailBox;
     private Mail mail;
@@ -80,15 +80,14 @@ public class NewMessageController implements Initializable {
         mail.setThreadUUID(mailToSet.getThreadUUID());
         mail.setThreadStarter(mailToSet.getThreadStarter());
         mail.setLastMailUUID(mailToSet.getLastMailUUID());
+        subjectField.setText(mailToSet.getSubject());
         editHTMLEditor.setHtmlText(mailToSet.getBody());
     }
 
     @FXML
     public void onSendButtonClick(){
-        if(checkReceivers()){
+        if(checkAndPutReceivers()){
             sendMail();
-        }else{
-            showAlert("You are sending the mail to no one.");
         }
     }
 
@@ -107,18 +106,9 @@ public class NewMessageController implements Initializable {
     }
 
     public void sendMail(){
-        ArrayList<String> to =  new ArrayList<>(Arrays.asList(toField.getText().split(";")));
-        ArrayList<String> cc = new ArrayList<>(Arrays.asList(ccField.getText().split(";")));
-        ArrayList<String> ccn = new ArrayList<>(Arrays.asList(ccnField.getText().split(";")));
-
-        mail.setCC(cc);
-        mail.setCCn(ccn);
-        mail.setTo(to);
         mail.setFrom(new ArrayList<String>(Collections.singletonList(sessionManager.getAccount().getEmail())));
         mail.setBody(editHTMLEditor.getHtmlText());
         mail.setSubject(subjectField.getText());
-
-        cleanMailAddresses(mail);
 
         Task<Bag> sendTask = new Task<Bag>() {
             @Override
@@ -146,8 +136,56 @@ public class NewMessageController implements Initializable {
     }
 
 
-    public boolean checkReceivers(){
-        return !(toField.getText().isBlank()&&ccField.getText().isBlank()&&ccnField.getText().isBlank());
+    public boolean checkAndPutReceivers(){
+        ArrayList<String> to =  new ArrayList<>(Arrays.asList(toField.getText().split(";")));
+        ArrayList<String> cc = new ArrayList<>(Arrays.asList(ccField.getText().split(";")));
+        ArrayList<String> ccn = new ArrayList<>(Arrays.asList(ccnField.getText().split(";")));
+
+        toField.setText(toField.getText().replace(" ",""));
+        ccField.setText(ccField.getText().replace(" ",""));
+        ccnField.setText(ccnField.getText().replace(" ",""));
+
+        mail.setCC(cc);
+        mail.setCCn(ccn);
+        mail.setTo(to);
+
+        for(String toS : to )System.out.println("TOS "+toS);
+
+        boolean isOK=true;
+        cleanMailAddresses(mail);
+
+
+        ArrayList<String> wrongMails = new ArrayList<>();
+        ArrayList<String> allMails = new ArrayList<>();
+        allMails.addAll(to); allMails.addAll(cc); allMails.addAll(ccn);
+
+        Pattern mailValidator = Pattern.compile("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])");
+        for(String mailToCheck : allMails){
+            System.out.println("CHEK MAIL "+mailToCheck);
+            if(!(mailValidator.matcher(mailToCheck).matches())){
+                wrongMails.add(mailToCheck);
+                System.out.println("WRONG MAIL "+mailToCheck);
+            }
+        }
+
+        StringBuilder message = new StringBuilder();
+
+        if(to.isEmpty()&&cc.isEmpty()&&ccn.isEmpty()){
+            message.append("Insert at least one email address");
+                    isOK=false;
+        }
+        if(!wrongMails.isEmpty()) {
+            message.append("Check the following addresses:\n");
+            for(String wrongMail : wrongMails)
+                message.append(wrongMail).append("\n");
+            isOK = false;
+        }
+
+        if(!isOK){
+            showError(message.toString());
+        }
+
+        return isOK;
     }
 
 

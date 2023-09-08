@@ -16,9 +16,7 @@ public class MailVault  implements java.io.Serializable{
     }
 
     public void addMail(Mail mail) {
-        for(String toAdd : mail.getTo()){
-            System.out.println("MAILVAULT IN TO: "+toAdd);
-        }
+
         mails.add(mail);
     }
 
@@ -54,6 +52,16 @@ public class MailVault  implements java.io.Serializable{
             }
         }
         return CCedTo;
+    }
+
+    public ArrayList<Mail> getMailCCnedTo(Account receiver){
+        ArrayList<Mail> CCnedTo = new ArrayList<Mail>();
+        for (Mail mail : mails) {
+            if (mail.getCCn().contains(receiver.getEmail()) && mail.shouldIGiveThisMailTo(receiver.getEmail())) {
+                CCnedTo.add(mail);
+            }
+        }
+        return CCnedTo;
     }
 
     public ArrayList<Mail> getInbox(Account receiver){

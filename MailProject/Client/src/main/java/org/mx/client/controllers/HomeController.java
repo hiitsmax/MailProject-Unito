@@ -1,5 +1,6 @@
 package org.mx.client.controllers;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,8 +22,7 @@ import org.mx.client.services.RefreshMailbox;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class HomeController implements Initializable {
     @FXML
@@ -45,12 +45,38 @@ public class HomeController implements Initializable {
     private TableColumn<Mail, ArrayList<String>> subjectSentColumn;
     @FXML
     private TableColumn<Mail, String> bodySentColumn;
-
+    @FXML
+    private TableColumn<Mail, Date> timestampInboxColumn;
+    @FXML
+    private TableColumn<Mail, Date> timestampSentColumn;
+    @FXML
+    private Label statusLabel;
+    @FXML
+    private Button deleteMessageButton;
+    private SimpleStringProperty status;
     private SessionManager sessionManager;
     private MailBox mailBox;
+    private Mail selectedMail;
 
 
+    @FXML
+    private void onDeleteMessageClick(){
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete Mail");
+        alert.setHeaderText("Are you sure want to delete this mail?");
 
+        // option != null.
+        Optional<ButtonType> option = alert.showAndWait();
+
+        if (option.get() == ButtonType.OK) {
+            try {
+                sessionManager.deleteMail(selectedMail);
+                deleteMessageButton.setDisable(true);
+            } catch (Exception e) {
+                showError(e.getMessage());
+            }
+        }
+    }
     private void showAlert(String message){
         Alert alert = new Alert(Alert.AlertType.WARNING);
 
@@ -79,6 +105,28 @@ public class HomeController implements Initializable {
         fromInboxColumn.setCellValueFactory(new PropertyValueFactory<>("From"));
         subjectInboxColumn.setCellValueFactory(new PropertyValueFactory<>("subject"));
         bodyInboxColumn.setCellValueFactory(new PropertyValueFactory<>("body"));
+
+        for(Mail CCn : mailBox.getCCned()){
+            CCn.setCC(new ArrayList<String>(Arrays.asList(sessionManager.getAccount().getEmail())));
+        }
+
+        timestampInboxColumn.setCellValueFactory(new PropertyValueFactory<>("SentDate"));
+        timestampInboxColumn.setCellFactory(new Callback<>() {
+            @Override
+            public TableCell<Mail, Date> call(TableColumn<Mail, Date> column) {
+                return new TableCell<Mail, Date>() {
+                    @Override
+                    protected void updateItem(Date item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item == null || empty) {
+                            setText(null);
+                        } else {
+                            setText(item.toString());
+                        }
+                    }
+                };
+            }
+        });
         fromInboxColumn.setCellFactory(new Callback<>() {
             @Override
             public TableCell<Mail, ArrayList<String>> call(TableColumn<Mail, ArrayList<String>> column) {
@@ -114,9 +162,10 @@ public class HomeController implements Initializable {
         inboxTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                selectedMail = (Mail) inboxTable.getSelectionModel().getSelectedItem();
+                if(selectedMail!=null){
+                    deleteMessageButton.setDisable(false);
                 if(event.getClickCount() == 2){
-                    Mail selectedMail = (Mail) inboxTable.getSelectionModel().getSelectedItem();
-                    if(selectedMail!=null){
                         try {
                             openMail(selectedMail);
                         } catch (IOException e) {
@@ -130,12 +179,33 @@ public class HomeController implements Initializable {
         sessionManager.setMailBox(mailBox);
 
         inboxTable.getItems().addAll(mailBox.getReceived());
+        inboxTable.getItems().addAll(mailBox.getCCed());
+        inboxTable.getItems().addAll(mailBox.getCCned());
+        inboxTable.getItems().sort(Comparator.comparing(Mail::getSentDate).reversed());
     }
     private void fullfillSent(){
 
         fromSentColumn.setCellValueFactory(new PropertyValueFactory<>("From"));
         subjectSentColumn.setCellValueFactory(new PropertyValueFactory<>("subject"));
         bodySentColumn.setCellValueFactory(new PropertyValueFactory<>("body"));
+
+        timestampSentColumn.setCellValueFactory(new PropertyValueFactory<>("SentDate"));
+        timestampSentColumn.setCellFactory(new Callback<>() {
+            @Override
+            public TableCell<Mail, Date> call(TableColumn<Mail, Date> column) {
+                return new TableCell<Mail, Date>() {
+                    @Override
+                    protected void updateItem(Date item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (item == null || empty) {
+                            setText(null);
+                        } else {
+                            setText(item.toString());
+                        }
+                    }
+                };
+            }
+        });
         fromSentColumn.setCellFactory(new Callback<>() {
             @Override
             public TableCell<Mail, ArrayList<String>> call(TableColumn<Mail, ArrayList<String>> column) {
@@ -171,9 +241,10 @@ public class HomeController implements Initializable {
         sentTable.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
+                selectedMail = (Mail) sentTable.getSelectionModel().getSelectedItem();
+                if(selectedMail!=null){
+                    deleteMessageButton.setDisable(false);
                 if(event.getClickCount() == 2){
-                    Mail selectedMail = (Mail) sentTable.getSelectionModel().getSelectedItem();
-                    if(selectedMail!=null){
                         try {
                             openMail(selectedMail);
                         } catch (IOException e) {
@@ -185,6 +256,7 @@ public class HomeController implements Initializable {
         });
 
         sentTable.getItems().addAll(mailBox.getSent());
+        sentTable.getItems().sort(Comparator.comparing(Mail::getSentDate).reversed());
     }
 
     public void welcomeBag(Bag bag){
@@ -228,9 +300,23 @@ public class HomeController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        RefreshMailbox refreshService = new RefreshMailbox(sessionManager, inboxTable, sentTable);
+        status = new SimpleStringProperty();
+
+        RefreshMailbox refreshService = new RefreshMailbox(sessionManager, inboxTable, sentTable, status);
         refreshService.setPeriod(Duration.seconds(1)); // The interval between executions.
         refreshService.start();
+
+        statusLabel.textProperty().bind(status);
+
+        fromInboxColumn.maxWidthProperty().bind(inboxTable.widthProperty().divide(4));
+        subjectInboxColumn.maxWidthProperty().bind(inboxTable.widthProperty().divide(4));
+        timestampInboxColumn.maxWidthProperty().bind(inboxTable.widthProperty().divide(4));
+        bodyInboxColumn.maxWidthProperty().bind(inboxTable.widthProperty().divide(4));
+
+        fromSentColumn.maxWidthProperty().bind(inboxTable.widthProperty().divide(4));
+        subjectSentColumn.maxWidthProperty().bind(inboxTable.widthProperty().divide(4));
+        timestampSentColumn.maxWidthProperty().bind(inboxTable.widthProperty().divide(4));
+        bodySentColumn.maxWidthProperty().bind(inboxTable.widthProperty().divide(4));
 
     }
 }

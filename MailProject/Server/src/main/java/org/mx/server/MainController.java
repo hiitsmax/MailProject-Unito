@@ -34,6 +34,7 @@ public class MainController implements Initializable {
     private ObservableList<String> logList;
     FileChooser fileChooser = new FileChooser();
     FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Postal center (*.post)", "*.post");
+    private File centerFile;
 
     @FXML
     protected void onNewButtonClick() {
@@ -49,7 +50,6 @@ public class MainController implements Initializable {
     @FXML
     protected void onOpenButtonClick() {
 
-
         fileChooser.setTitle("Open a postal center");
         File file = fileChooser.showOpenDialog(null);
 
@@ -60,13 +60,19 @@ public class MainController implements Initializable {
     protected void onStartButtonClick() {
         Platform.runLater(()->{
             sessionManager.start();
+            startButton.setDisable(true);
+            stopButton.setDisable(false);
             disablePostalCenterButtons(true);
         });
     }
     @FXML
     protected void onStopButtonClick() {
+        logList.add("Stopping server");
         sessionManager.stop();
+        savePostalCenter(centerFile);
         disablePostalCenterButtons(false);
+        startButton.setDisable(false);
+        stopButton.setDisable(true);
     }
 
     private void savePostalCenter(File file){
@@ -74,6 +80,8 @@ public class MainController implements Initializable {
             objectOutputStream.writeObject(postalCenter);
             sessionManager.setPostalCenter(postalCenter);
             disableServerButtons(false);
+            logList.add("Postal center file saved");
+            centerFile=file;
         }catch (IOException e){
             showError(e.getMessage());
             logList.add("Error while creating postal center: "+e.getMessage());
@@ -86,6 +94,7 @@ public class MainController implements Initializable {
             if (readObject instanceof PostalCenter ps) {
                 postalCenter = ps;
                 sessionManager.setPostalCenter(ps);
+                centerFile=file;
             } else {
                 showError("The file is not a postal center");
                 logList.add("Error while opening postal center: The file is not a postal center");

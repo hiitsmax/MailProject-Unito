@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.controlsfx.control.Notifications;
@@ -12,8 +13,10 @@ import org.mx.client.MainApplication;
 import org.mx.client.services.SessionManager;
 import org.mx.post.center.MailBox;
 import org.mx.post.entities.Bag;
+import org.mx.post.entities.Mail;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class MainController {
     @FXML

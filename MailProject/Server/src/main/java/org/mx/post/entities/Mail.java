@@ -113,6 +113,8 @@ public class Mail implements java.io.Serializable{
         this.CC = CC;
         From = from;
         SentDate = sentDate;
+        this.CCn = new ArrayList<>();
+        this.subject="";
         lastMailUUID="";
     }
 
@@ -120,6 +122,8 @@ public class Mail implements java.io.Serializable{
         this.To = new ArrayList<>();
         this.CC = new ArrayList<>();
         this.From = new ArrayList<>();
+        this.CCn = new ArrayList<>();
+        this.subject="";
         lastMailUUID="";
     }
 

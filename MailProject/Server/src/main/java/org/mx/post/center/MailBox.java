@@ -8,15 +8,18 @@ public class MailBox implements java.io.Serializable{
     ArrayList<Mail> sent;
     ArrayList<Mail> received;
     ArrayList<Mail> CCed;
+    ArrayList<Mail> CCned;
     public MailBox() {
         sent = new ArrayList<Mail>();
         received = new ArrayList<Mail>();
         CCed = new ArrayList<Mail>();
+        CCned = new ArrayList<Mail>();
     }
-    public MailBox(ArrayList<Mail> sent, ArrayList<Mail> received, ArrayList<Mail> CCed) {
+    public MailBox(ArrayList<Mail> sent, ArrayList<Mail> received, ArrayList<Mail> CCed, ArrayList<Mail> CCned) {
         this.sent = sent;
         this.received = received;
         this.CCed = CCed;
+        this.CCned = CCned;
     }
 
     public ArrayList<Mail> getSent() {
@@ -39,6 +42,14 @@ public class MailBox implements java.io.Serializable{
         return CCed;
     }
 
+    public ArrayList<Mail> getCCned() {
+        return CCned;
+    }
+
+    public void setCCned(ArrayList<Mail> CCned) {
+        this.CCned = CCned;
+    }
+
     public void setCCed(ArrayList<Mail> CCed) {
         this.CCed = CCed;
     }
@@ -46,12 +57,14 @@ public class MailBox implements java.io.Serializable{
     public MailBox getDifferenceFrom(MailBox mailBox){
         ArrayList<Mail> sentDifference = getDifference(sent, mailBox.getSent());
         ArrayList<Mail> ccedDifference = getDifference(CCed, mailBox.getCCed());
+        ArrayList<Mail> ccnedDifference = getDifference(CCned, mailBox.getCCned());
         ArrayList<Mail> receivedDifference = getDifference(received, mailBox.getReceived());
 
         MailBox resultBox = new MailBox();
         resultBox.setReceived(receivedDifference);
         resultBox.setCCed(ccedDifference);
         resultBox.setSent(sentDifference);
+        resultBox.setCCned(ccnedDifference);
 
         return resultBox;
     }
@@ -68,9 +81,7 @@ public class MailBox implements java.io.Serializable{
         while(found){
             found = false;
             for(Mail singleMail: allMails){
-                System.out.println("SINGLE MAIL "+singleMail.getLastMailUUID());
                 if(singleMail.getUUID().equals(lastMail.getLastMailUUID())){
-                    System.out.println("TRUE");
                     mailThread.add(singleMail);
                     lastMail=singleMail;
                     found=true;

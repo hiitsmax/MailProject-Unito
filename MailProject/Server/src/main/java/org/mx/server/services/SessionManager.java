@@ -45,7 +45,11 @@ public class SessionManager {
 
     public void stop(){
         if(serverThread!=null){
-            serverThread.interrupt();
+            try{
+                serverThread.interrupt();
+            }catch(Exception e){
+                logList.add("Interrupting exception: "+e.getMessage());
+            }
         }
     }
 
@@ -147,10 +151,12 @@ public class SessionManager {
         uuidMail(returnMail);
         returnMail.setThreadUUID(mail.getThreadUUID());
 
-        returnMail.setTo(mail.getFrom());
+        returnMail.setTo(new ArrayList<>());
         // To review, it can expose ccn
-        returnMail.getTo().addAll(mail.getCCn());
-        returnMail.getTo().addAll(mail.getCC());
+        returnMail.getTo().addAll(mail.getFrom());
+        returnMail.getCCn().addAll(mail.getCCn());
+        returnMail.getCC().addAll(mail.getCC());
+
 
         ArrayList<String> mailTo = new ArrayList<>(Arrays.asList("noreply@post.com"));
         returnMail.setFrom(mailTo);
@@ -164,18 +170,40 @@ public class SessionManager {
         ArrayList<String> mailsPresent = new ArrayList<>();
         ArrayList<String> mailsNotPresent = new ArrayList<>();
 
+        ArrayList<String> newTo = new ArrayList<>();
+        ArrayList<String> newCC = new ArrayList<>();
+        ArrayList<String> newCCn = new ArrayList<>();
+
+        newTo.addAll(mail.getTo());
+        newCC.addAll(mail.getCC());
+        newCCn.addAll(mail.getCCn());
+
         for(String mailFrom: mail.getTo()){
-            System.out.println("SANITIZE TO: " + mailFrom);
-            if(postalCenter.isAccountPresent(mailFrom)){
-                mailsPresent.add(mailFrom);
-            }else{
+            if(!(postalCenter.isAccountPresent(mailFrom))){
                 log("Mail not found: "+mailFrom);
                 mailsNotPresent.add(mailFrom);
+                newTo.remove(mailFrom);
+            }
+        }
+        for(String mailFrom: mail.getCC()){
+            if(!(postalCenter.isAccountPresent(mailFrom))){
+                log("Mail not found: "+mailFrom);
+                mailsNotPresent.add(mailFrom);
+                newCC.remove(mailFrom);
+            }
+        }
+        for(String mailFrom: mail.getCCn()){
+            if(!(postalCenter.isAccountPresent(mailFrom))){
+                log("Mail not found: "+mailFrom);
+                mailsNotPresent.add(mailFrom);
+                newCCn.remove(mailFrom);
             }
         }
 
+        mail.setTo(newTo);
+        mail.setCC(newCC);
+        mail.setCCn(newCCn);
         returnMail(mail, mailsNotPresent);
-        mail.setTo(mailsPresent);
 
     }
 
@@ -193,9 +221,7 @@ public class SessionManager {
         if(incomingBag.getPayload() instanceof Mail){
             Mail mail = (Mail)incomingBag.getPayload();
             log("UUIDing mail");
-            System.out.println("UUID BEFORE " + mail.getThreadUUID());
             uuidMail(mail);
-            System.out.println("UUID AFTER " + mail.getThreadUUID());
             log("Sanitizing mail");
             sanitizeMail(mail);
             log("Email put in the center");
