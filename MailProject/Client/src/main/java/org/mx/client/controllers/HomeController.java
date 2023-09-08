@@ -1,6 +1,10 @@
 package org.mx.client.controllers;
 
+import javafx.beans.Observable;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -53,12 +57,28 @@ public class HomeController implements Initializable {
     private Label statusLabel;
     @FXML
     private Button deleteMessageButton;
+    @FXML
+    private Button openMessageButton;
     private SimpleStringProperty status;
     private SessionManager sessionManager;
     private MailBox mailBox;
     private Mail selectedMail;
 
+    private ObservableList<Mail> inboxList = FXCollections.observableArrayList();
+    private ObservableList<Mail> sentList = FXCollections.observableArrayList();
+    private SimpleObjectProperty<ObservableList<Mail>> observableInbox = new SimpleObjectProperty<>(inboxList);
+    private SimpleObjectProperty<ObservableList<Mail>> observableSent = new SimpleObjectProperty<>(sentList);
 
+    @FXML
+    private void onOpenMessageClick(){
+        try {
+            openMail(selectedMail);
+        } catch (Exception e) {
+            showError(e.getMessage());
+        }
+        openMessageButton.setDisable(true);
+        deleteMessageButton.setDisable(true);
+    }
     @FXML
     private void onDeleteMessageClick(){
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -165,6 +185,7 @@ public class HomeController implements Initializable {
                 selectedMail = (Mail) inboxTable.getSelectionModel().getSelectedItem();
                 if(selectedMail!=null){
                     deleteMessageButton.setDisable(false);
+                    openMessageButton.setDisable(false);
                 if(event.getClickCount() == 2){
                         try {
                             openMail(selectedMail);
@@ -178,10 +199,12 @@ public class HomeController implements Initializable {
 
         sessionManager.setMailBox(mailBox);
 
-        inboxTable.getItems().addAll(mailBox.getReceived());
-        inboxTable.getItems().addAll(mailBox.getCCed());
-        inboxTable.getItems().addAll(mailBox.getCCned());
-        inboxTable.getItems().sort(Comparator.comparing(Mail::getSentDate).reversed());
+        inboxTable.itemsProperty().bind(observableInbox);
+
+        inboxList.addAll(mailBox.getReceived());
+        inboxList.addAll(mailBox.getCCed());
+        inboxList.addAll(mailBox.getCCned());
+        inboxList.sort(Comparator.comparing(Mail::getSentDate).reversed());
     }
     private void fullfillSent(){
 
@@ -244,6 +267,7 @@ public class HomeController implements Initializable {
                 selectedMail = (Mail) sentTable.getSelectionModel().getSelectedItem();
                 if(selectedMail!=null){
                     deleteMessageButton.setDisable(false);
+                    openMessageButton.setDisable(false);
                 if(event.getClickCount() == 2){
                         try {
                             openMail(selectedMail);
@@ -255,8 +279,9 @@ public class HomeController implements Initializable {
             }
         });
 
-        sentTable.getItems().addAll(mailBox.getSent());
-        sentTable.getItems().sort(Comparator.comparing(Mail::getSentDate).reversed());
+        sentTable.itemsProperty().bind(observableSent);
+        sentList.addAll(mailBox.getSent());
+        sentList.sort(Comparator.comparing(Mail::getSentDate).reversed());
     }
 
     public void welcomeBag(Bag bag){
@@ -311,7 +336,7 @@ public class HomeController implements Initializable {
 
         status = new SimpleStringProperty();
 
-        RefreshMailbox refreshService = new RefreshMailbox(sessionManager, inboxTable, sentTable, status);
+        RefreshMailbox refreshService = new RefreshMailbox(sessionManager, inboxList, sentList, status);
         refreshService.setPeriod(Duration.seconds(1)); // The interval between executions.
         refreshService.start();
 

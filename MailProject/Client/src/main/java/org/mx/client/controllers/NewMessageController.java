@@ -113,7 +113,11 @@ public class NewMessageController implements Initializable {
         Task<Bag> sendTask = new Task<Bag>() {
             @Override
             protected Bag call() throws Exception {
-                return sessionManager.sendMail(mail);
+                try{
+                    return sessionManager.sendMail(mail);
+                }catch (Exception e){
+                    throw e;
+                }
             }
         };
         sendTask.setOnSucceeded((e)->{
@@ -126,6 +130,12 @@ public class NewMessageController implements Initializable {
         sendTask.setOnCancelled((e)->{
             showError(sendTask.getException().getMessage());
         });
+        sendTask.exceptionProperty().addListener(((observable, oldValue, newValue) -> {
+            if(newValue!=null){
+                Exception ex = (Exception) newValue;
+                showError(ex.getMessage());
+            }
+        }));
 
         Thread sendThread = new Thread(sendTask);
         sendThread.start();
@@ -149,7 +159,6 @@ public class NewMessageController implements Initializable {
         mail.setCCn(ccn);
         mail.setTo(to);
 
-        for(String toS : to )System.out.println("TOS "+toS);
 
         boolean isOK=true;
         cleanMailAddresses(mail);
@@ -161,10 +170,8 @@ public class NewMessageController implements Initializable {
 
         Pattern mailValidator = Pattern.compile("(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])");
         for(String mailToCheck : allMails){
-            System.out.println("CHEK MAIL "+mailToCheck);
             if(!(mailValidator.matcher(mailToCheck).matches())){
                 wrongMails.add(mailToCheck);
-                System.out.println("WRONG MAIL "+mailToCheck);
             }
         }
 

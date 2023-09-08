@@ -188,9 +188,6 @@ public class OpenMessageController {
 
         body=body.replace("contenteditable=\"true\"", "contenteditable=\"false\"");
 
-        System.out.println("\n");
-        System.out.println(body);
-        System.out.println("\n");
         messageWebView.getEngine().loadContent(body);
     }
 

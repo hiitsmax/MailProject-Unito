@@ -2,6 +2,7 @@ package org.mx.client.services;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.ObservableList;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
 import javafx.geometry.Pos;
@@ -20,11 +21,11 @@ import java.util.Date;
 public class RefreshMailbox extends ScheduledService<Void> {
 
     SessionManager sessionManager;
-    TableView inboxTable;
-    TableView sentTable;
+    ObservableList<Mail> inboxTable;
+    ObservableList<Mail> sentTable;
     SimpleStringProperty statusLabel;
 
-    public RefreshMailbox(SessionManager sessionManager, TableView inboxTable, TableView sentTable, SimpleStringProperty statusLabel){
+    public RefreshMailbox(SessionManager sessionManager, ObservableList<Mail> inboxTable, ObservableList<Mail> sentTable, SimpleStringProperty statusLabel){
         this.sessionManager=sessionManager;
         this.sentTable=sentTable;
         this.inboxTable=inboxTable;
@@ -44,33 +45,32 @@ public class RefreshMailbox extends ScheduledService<Void> {
 
 
                     MailBox mailsToRemove = oldMailBox.getDifferenceFrom(newMailBox);
-                    for(Mail a: mailsToRemove.getReceived()) System.out.println(a.getUUID());
                     for(Mail mailToRemove : mailsToRemove.getCCed()){
-                        inboxTable.getItems().remove(mailToRemove);
+                        inboxTable.remove(mailToRemove);
                     }
                     for(Mail mailToRemove : mailsToRemove.getCCned()){
-                        inboxTable.getItems().remove(mailToRemove);
+                        inboxTable.remove(mailToRemove);
                     }
                     for(Mail mailToRemove : mailsToRemove.getReceived()){
-                        inboxTable.getItems().remove(mailToRemove);
+                        inboxTable.remove(mailToRemove);
                     }
 
                     for(Mail CCn : difference.getCCned()){
                         CCn.setCC(new ArrayList<String>(Arrays.asList(sessionManager.getAccount().getEmail())));
                     }
                     for(Mail mailToRemove : mailsToRemove.getSent()){
-                        sentTable.getItems().remove(mailToRemove);
+                        sentTable.remove(mailToRemove);
                     }
 
                     mailsToNotify.addAll(difference.getCCed());
                     mailsToNotify.addAll(difference.getReceived());
                     mailsToNotify.addAll(difference.getCCned());
 
-                    inboxTable.getItems().addAll(mailsToNotify);
-                    sentTable.getItems().addAll(difference.getSent());
+                    inboxTable.addAll(mailsToNotify);
+                    sentTable.addAll(difference.getSent());
 
-                    inboxTable.getItems().sort(Comparator.comparing(Mail::getSentDate).reversed());
-                    sentTable.getItems().sort(Comparator.comparing(Mail::getSentDate).reversed());
+                    inboxTable.sort(Comparator.comparing(Mail::getSentDate).reversed());
+                    sentTable.sort(Comparator.comparing(Mail::getSentDate).reversed());
 
                     Platform.runLater(()->{
                         for(Mail mail : mailsToNotify){
