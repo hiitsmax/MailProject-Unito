@@ -89,7 +89,7 @@ public class MainController {
 
         Scene scene = new Scene(fxmlLoader.load());
         Stage secondStage = new Stage();
-        secondStage.setTitle("Hello!");
+        secondStage.setTitle("Home");
         secondStage.setScene(scene);
         secondStage.show();
 

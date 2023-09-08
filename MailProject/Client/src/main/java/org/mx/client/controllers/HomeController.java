@@ -276,7 +276,16 @@ public class HomeController implements Initializable {
 
         Scene scene = new Scene(fxmlLoader.load());
         Stage secondStage = new Stage();
-        secondStage.setTitle("Hello!");
+
+        String windowTitle="";
+        if(mail.getSubject()==null)
+            windowTitle = "Message";
+        else if(mail.getSubject().isBlank()||mail.getSubject().equals(" ")||mail.getSubject().isEmpty())
+            windowTitle = "Message";
+        else
+            windowTitle = mail.getSubject();
+
+        secondStage.setTitle(windowTitle);
         secondStage.setScene(scene);
         secondStage.show();
 
